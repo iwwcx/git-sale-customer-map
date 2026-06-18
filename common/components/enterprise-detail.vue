@@ -651,17 +651,17 @@
               <view class="website-list">
                 <view
                   class="website-item"
-                  v-for="(site, si) in report.WebSiteList"
-                  :key="si"
+                  v-for="(site, index) in report.WebSiteList"
+                  :key="index"
                   @tap="site.WebSite && openWebSite(site.WebSite)"
                 >
-                  <view class="website-rank">{{ si + 1 }}</view>
+                  <view class="website-rank">{{ index + 1 }}</view>
                   <view class="website-body">
                     <view class="website-header">
                       <text class="website-name">{{ site.Name || '-' }}</text>
                       <text class="website-type">{{ site.Type || '-' }}</text>
                     </view>
-                    <text class="website-url" :class="site.WebSite ? 'at-cell-link-active' : ''">{{ site.WebSite || '-' }}</text>
+                    <text class="website-url">{{ site.WebSite || '-' }}</text>
                   </view>
                 </view>
               </view>
