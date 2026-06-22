@@ -12,6 +12,7 @@
           <view class="tab-item" :class="{ active: currentTab === 'product' }" @tap="changeTab('product')">搜产品需求</view>
           <view class="tab-item" :class="{ active: currentTab === 'company' }" @tap="changeTab('company')">搜企业</view>
           <view class="tab-item" :class="{ active: currentTab === 'engineer' }" @tap="changeTab('engineer')">搜工程师</view>
+          <view class="tab-item" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
         </view>
       </template>
     </search-product>
@@ -23,6 +24,7 @@
           <view class="tab-item" :class="{ active: currentTab === 'product' }" @tap="changeTab('product')">搜产品需求</view>
           <view class="tab-item" :class="{ active: currentTab === 'company' }" @tap="changeTab('company')">搜企业</view>
           <view class="tab-item" :class="{ active: currentTab === 'engineer' }" @tap="changeTab('engineer')">搜工程师</view>
+          <view class="tab-item" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
         </view>
       </template>
     </search-company>
@@ -34,9 +36,22 @@
           <view class="tab-item" :class="{ active: currentTab === 'product' }" @tap="changeTab('product')">搜产品需求</view>
           <view class="tab-item" :class="{ active: currentTab === 'company' }" @tap="changeTab('company')">搜企业</view>
           <view class="tab-item" :class="{ active: currentTab === 'engineer' }" @tap="changeTab('engineer')">搜工程师</view>
+          <view class="tab-item" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
         </view>
       </template>
     </search-engineer>
+
+    <!-- AI助手 -->
+    <search-ai-assistant ref="searchAiAssistantRef" v-show="currentTab === 'ai'">
+      <template #header>
+        <view class="tab-bar">
+          <view class="tab-item" :class="{ active: currentTab === 'product' }" @tap="changeTab('product')">搜产品需求</view>
+          <view class="tab-item" :class="{ active: currentTab === 'company' }" @tap="changeTab('company')">搜企业</view>
+          <view class="tab-item" :class="{ active: currentTab === 'engineer' }" @tap="changeTab('engineer')">搜工程师</view>
+          <view class="tab-item" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
+        </view>
+      </template>
+    </search-ai-assistant>
   </view>
 </template>
 
@@ -44,15 +59,16 @@
 import SearchProduct from './components/search-product.vue'
 import SearchCompany from './components/search-company.vue'
 import SearchEngineer from './components/search-engineer.vue'
+import SearchAiAssistant from './components/search-ai-assistant.vue'
 import MemberBanner from '@/common/components/member-banner.vue'
 import { getMemberInfo } from '@/static/api/index.js'
 import { mixinShowMemberBanner } from '@/common/utils/member.js'
 
 export default {
-  components: { SearchProduct, SearchCompany, SearchEngineer, MemberBanner },
+  components: { SearchProduct, SearchCompany, SearchEngineer, SearchAiAssistant, MemberBanner },
   data() {
     return {
-      currentTab: 'product', // 当前激活的子 tab：product / company / engineer
+      currentTab: 'product', // 当前激活的子 tab：product / company / engineer / ai
       showMemberBanner: mixinShowMemberBanner() // 是否展示非会员/试用横幅
     }
   },
@@ -91,7 +107,8 @@ export default {
       const refMap = {
         product: this.$refs.searchProductRef,
         company: this.$refs.searchCompanyRef,
-        engineer: this.$refs.searchEngineerRef
+        engineer: this.$refs.searchEngineerRef,
+        ai: this.$refs.searchAiAssistantRef
       }
       const target = refMap[this.currentTab]
       try {
@@ -125,16 +142,24 @@ export default {
   display: flex;
   align-items: center;
   margin-bottom: 24rpx;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 
   .tab-item {
     position: relative;
     height: 54rpx;
     line-height: 54rpx;
-    margin-right: 56rpx;
+    margin-right: 40rpx;
     text-align: center;
-    font-size: 30rpx;
+    font-size: 28rpx;
     color: #8a8f99;
     transition: all 0.3s;
+    flex-shrink: 0;
+    white-space: nowrap;
+
+    &:last-child {
+      margin-right: 0;
+    }
 
     // 激活态：文字加深 + 底部蓝色短线
     &.active {

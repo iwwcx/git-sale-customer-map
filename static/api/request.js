@@ -101,7 +101,7 @@ const createRequest = (apiKey = 'api60') => {
         'Content-Type': 'application/json',
         ...headers
       },
-      timeout: 15000
+      timeout: 150000
     };
 
     // 添加 token

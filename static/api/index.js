@@ -371,3 +371,15 @@ export function getMyCustomerList(params) {
   });
 }
 
+// AI区域企业报告
+export function deepseekQuery(data) {
+  return request({
+    url: '/tanke/deepseekQuery',
+    method: 'post',
+    data,
+    apiKey: 'api80'
+  });
+}
+
+
+

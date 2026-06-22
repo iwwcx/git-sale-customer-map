@@ -1,4 +1,4 @@
-<!-- 搜资源-搜产品 tab：搜索框 + 省市区筛选（功能未接，纯 UI 占位） -->
+<!-- 搜资源-搜产品 tab：搜索框 + 省市区筛选 -->
 <template>
   <view class="search-product">
     <view class="control-card">
@@ -42,19 +42,19 @@
     </view>
 
     <!-- 结果列表（与探客工程师卡片保持一致，只是活跃度位置换成地点） -->
-    <view v-if="isRecommend && recommendKeyword" class="recommend-title">🔥猜您对 <text style="color: red;font-weight: bold;">「{{ this.recommendKeyword }}」</text> 感兴趣，本次为您推荐
+    <view v-if="isRecommend && recommendKeyword" class="recommend-title">🔥猜您对<text style="color: red;font-weight: bold;">「{{ this.recommendKeyword }}」</text>感兴趣，本次为您推荐
       <text style="color: red;font-weight: bold;"> 
         {{ displayList.length ?
         (displayList.length > 99 ? '99+' : displayList.length)
         : 0 
         }}
-      </text>位工程师</view>
+      </text> 位工程师</view>
     <view v-if="isRecommend && !recommendKeyword" class="recommend-title">🔥猜您对以下工程师感兴趣，为您推荐</view>
     <view v-if="!recommendLoading && !isRecommend && recommendKeyword" class="recommend-title">🔥本次搜索共计 <text style="color: red;font-weight: bold;"> 
       {{ displayList.length ?
         (displayList.length > 99 ? '99+' : displayList.length)
         : 0 
-      }} 
+      }}
      </text> 位工程师符合要求</view>
     <!-- 局部加载骨架屏 -->
     <view v-if="recommendLoading" class="recommend-loading">
@@ -309,7 +309,7 @@ export default {
           this.recommendKeyword = keywords[nextIndex]
           uni.setStorageSync('productKeywords', this.recommendKeyword)
           
-          const params = { productName: this.recommendKeyword, distance: 0 }
+          const params = { productName: this.recommendKeyword, distance: 0, sortBy: "random", pageSize: 50 }
           const lat = uni.getStorageSync('myLatitude')
           const lng = uni.getStorageSync('myLongitude')
           if (lat && lng) {

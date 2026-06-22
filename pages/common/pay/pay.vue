@@ -1,7 +1,49 @@
 <template>
   <view v-if="showUnderMaintenance" class="under-maintenance">
-    <empty-state title="暂无数据" hint="会员开通服务，敬请期待" />
+    <!-- ========== 维护页面 ========== -->
+    <view class="maintenance-content">
+      <!-- 顶部图标 -->
+      <view class="maint-icon-wrap">
+        <view class="maint-glow"></view>
+        <text class="maint-icon">⏰</text>
+      </view>
+
+      <!-- 标题 -->
+      <text class="maint-title">服务升级中</text>
+      <text class="maint-subtitle">会员开通服务正在升级维护</text>
+
+      <!-- 分隔线 -->
+      <view class="maint-divider"></view>
+
+      <!-- 服务说明卡片 -->
+      <view class="service-card">
+        <view class="service-card-title">会员尊享服务</view>
+        <view class="service-item">
+          <text class="service-dot">•</text>
+          <text class="service-text">40万+企业资源随心查</text>
+        </view>
+        <view class="service-item">
+          <text class="service-dot">•</text>
+          <text class="service-text">200万+工程师联系方式</text>
+        </view>
+        <view class="service-item">
+          <text class="service-dot">•</text>
+          <text class="service-text">365天全功能会员权益</text>
+        </view>
+        <view class="service-item">
+          <text class="service-dot">•</text>
+          <text class="service-text">专属客服一对一服务</text>
+        </view>
+      </view>
+
+      <!-- 底部返回 -->
+      <view class="back-btn" @tap="goBack">
+        <text class="back-text">返回首页</text>
+      </view>
+    </view>
   </view>
+
+  <!-- ========== 正文页面 ========== -->
 
   <view v-else class="pay-page">
     <!-- 顶部深色 VIP 横幅 -->
@@ -317,7 +359,6 @@
             <view class="agr-para">3.2 乙方负责保管自身小程序账号、登录信息、支付信息，因乙方泄露账号、密码、主动共享账号、转借账号导致的账号异常、权限盗用、数据泄露、财产损失等，全部由乙方自行承担责任，甲方不承担任何赔偿责任。</view>
             <view class="agr-para">3.3 乙方使用会员服务时，必须遵守国家法律法规、微信平台规则及本协议约定，禁止以下行为：</view>
             <view class="agr-list">
-              <view class="agr-list-item">（1）利用会员权限爬取、批量采集、复制、倒卖、传播平台数据，用于商业售卖、非法牟利；</view>
               <view class="agr-list-item">（2）破解、篡改小程序系统、数据，攻击平台服务器、干扰平台正常运营；</view>
               <view class="agr-list-item">（3）多设备批量登录、多人共享会员账号、转租会员权限；</view>
               <view class="agr-list-item">（4）利用本平台数据及服务从事违法违规、侵权、造谣、损害平台声誉等行为；</view>
@@ -430,6 +471,15 @@ export default {
     this.fetchInviterPayInfo()
   },
   methods: {
+    // ----------- 返回上一页
+    goBack() {
+      uni.navigateBack({
+        fail: () => {
+          uni.switchTab({ url: '/pages/mine/index' })
+        }
+      })
+    },
+
     // ----------- 点击联系客服：直接拨打电话
     onContactTap() {
       uni.makePhoneCall({
@@ -527,13 +577,166 @@ page {
   background: #f4f6fb;
 }
 
-// 维护中占位：占满整屏并居中展示缺省组件
+// 维护中占位：占满整屏并居中展示内容
 .under-maintenance {
   min-height: 100vh;
+  background: linear-gradient(180deg, #f0f5ff 0%, #fafbff 100%);
+  padding: 120rpx 40rpx 60rpx;
+}
+
+.maintenance-content {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background: #f4f6fb;
+  max-width: 600rpx;
+  margin: 0 auto;
+}
+
+.maint-icon-wrap {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+  margin-bottom: 40rpx;
+
+  .maint-glow {
+    position: absolute;
+    inset: -20rpx;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(74, 131, 249, 0.2) 0%, transparent 70%);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .maint-icon {
+    position: relative;
+    z-index: 1;
+    font-size: 80rpx;
+    line-height: 160rpx;
+    text-align: center;
+    display: block;
+    animation: clockShake 3s ease-in-out infinite;
+  }
+}
+
+.maint-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1d3b8c;
+  margin-bottom: 16rpx;
+}
+
+.maint-subtitle {
+  font-size: 28rpx;
+  color: #6b7280;
+  margin-bottom: 48rpx;
+}
+
+.maint-divider {
+  width: 100%;
+  height: 1rpx;
+  background: linear-gradient(90deg, transparent, #e6ebf5 50%, transparent);
+  margin-bottom: 48rpx;
+}
+
+.service-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(74, 131, 249, 0.08);
+  margin-bottom: 48rpx;
+
+  .service-card-title {
+    font-size: 30rpx;
+    font-weight: 600;
+    color: #0b1838;
+    margin-bottom: 24rpx;
+    text-align: center;
+  }
+
+  .service-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16rpx;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .service-dot {
+      font-size: 28rpx;
+      color: #4a83f9;
+      margin-right: 12rpx;
+    }
+
+    .service-text {
+      font-size: 26rpx;
+      color: #3d4a66;
+    }
+  }
+}
+
+.contact-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 60rpx;
+
+  .contact-tip {
+    font-size: 26rpx;
+    color: #6b7280;
+    margin-bottom: 20rpx;
+  }
+
+  .contact-phone {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+    padding: 20rpx 40rpx;
+    background: linear-gradient(135deg, #1d3b8c 0%, #2962ff 100%);
+    border-radius: 44rpx;
+    box-shadow: 0 8rpx 20rpx rgba(41, 98, 255, 0.3);
+    margin-bottom: 12rpx;
+
+    .phone-icon {
+      font-size: 32rpx;
+    }
+
+    .phone-num {
+      font-size: 32rpx;
+      font-weight: 600;
+      color: #fff;
+    }
+  }
+
+  .contact-hint {
+    font-size: 22rpx;
+    color: #9aa3b7;
+  }
+}
+
+.back-btn {
+  padding: 20rpx 60rpx;
+  border: 1rpx solid #d1d5db;
+  border-radius: 40rpx;
+
+  .back-text {
+    font-size: 28rpx;
+    color: #6b7280;
+  }
+
+  &:active {
+    background: #f4f6fb;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+@keyframes clockShake {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
 }
 
 .pay-page {
