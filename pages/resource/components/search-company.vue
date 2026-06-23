@@ -243,7 +243,7 @@ export default {
 // ==================== 顶部控制面板（与探客页保持一致）
 .control-card {
   position: sticky;
-  top: 0;
+  top: 12rpx;
   z-index: 10;
   margin: 0 24rpx 22rpx;
   padding: 24rpx;

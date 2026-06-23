@@ -42,13 +42,22 @@
     </view>
 
     <!-- 结果列表（与探客工程师卡片保持一致，只是活跃度位置换成地点） -->
-    <view v-if="isRecommend && recommendKeyword" class="recommend-title">🔥猜您对<text style="color: red;font-weight: bold;">「{{ this.recommendKeyword }}」</text>感兴趣，本次为您推荐
+    <!-- <view v-if="isRecommend && recommendKeyword" class="recommend-title">🔥猜您对<text style="color: red;font-weight: bold;">「{{ this.recommendKeyword }}」</text>感兴趣，本次为您推荐
       <text style="color: red;font-weight: bold;"> 
         {{ displayList.length ?
         (displayList.length > 99 ? '99+' : displayList.length)
         : 0 
         }}
-      </text> 位工程师</view>
+      </text> 位工程师
+    </view> -->
+    <view v-if="isRecommend && recommendKeyword" class="recommend-title">🔥根据您的销售产品类别，本次为您推荐
+     <text style="color: red;font-weight: bold;"> 
+        {{ displayList.length ?
+        (displayList.length > 99 ? '99+' : displayList.length)
+        : 0 
+        }}
+      </text> 位潜在客户
+    </view>
     <view v-if="isRecommend && !recommendKeyword" class="recommend-title">🔥猜您对以下工程师感兴趣，为您推荐</view>
     <view v-if="!recommendLoading && !isRecommend && recommendKeyword" class="recommend-title">🔥本次搜索共计 <text style="color: red;font-weight: bold;"> 
       {{ displayList.length ?
@@ -92,8 +101,12 @@
           </view>
         </view>
         <view class="comp-right">
+          <view class="comp-right-spacer"></view>
           <view class="distance-tag" v-if="item.distance">{{ (parseInt(item.distance) / 1000).toFixed(2) }}km</view>
-          <text class="arrow-right">›</text>
+          <view class="comp-right-bottom">
+            <!-- 只有推荐客户才显示不感兴趣按钮，避免影响正常搜索结果 -->
+            <view v-if="isRecommend" class="not-interested-btn" @tap.stop="openExcludeDialog(item, index)">不感兴趣</view>
+          </view>
         </view>
       </view>
     </view>
@@ -101,6 +114,18 @@
     <empty-state v-else-if="recommendList.length === 0" title="请输入产品名称" hint="输入产品名称并点击搜索" />
 
     <loading-overlay :visible="showLoading" text="正在加载..." />
+
+    <!-- 不感兴趣二次确认弹窗（自定义样式替代 uni.showModal） -->
+    <view v-if="showExcludeDialog" class="exclude-dialog-mask" @tap="closeExcludeDialog">
+      <view class="exclude-dialog-card" @tap.stop>
+        <view class="exclude-dialog-title">不感兴趣</view>
+        <view class="exclude-dialog-content">确认不再推荐这位工程师？</view>
+        <view class="exclude-dialog-actions">
+          <view class="exclude-dialog-btn cancel" @tap="closeExcludeDialog">取消</view>
+          <view class="exclude-dialog-btn confirm" @tap="confirmExclude">确定</view>
+        </view>
+      </view>
+    </view>
 
     <!-- 非会员点击搜索时弹出的会员引导蒙层 -->
     <member-mask
@@ -122,7 +147,7 @@
 </template>
 
 <script>
-import { searchUsersByProduct, getUserConfig, getUsersByCompanyName } from '@/static/api/index.js'
+import { searchUsersByProduct, getUserConfig, getUsersByCompanyName, excludeUser } from '@/static/api/index.js'
 import { showName, getProductImageUrlChat } from '@/common/utils/index.js'
 import { mixinCheckIsMember } from '@/common/utils/member.js'
 import EmptyState from '@/common/components/empty-state.vue'
@@ -144,7 +169,9 @@ export default {
       timeRange: null, // 当前选中的时间范围 { startTime, endTime }
       recommendKeyword: '', // 推荐关键词
       recommendList: [], // 推荐搜索结果列表
-      recommendLoading: false // 推荐列表局部加载状态
+      recommendLoading: false, // 推荐列表局部加载状态
+      showExcludeDialog: false, // 是否显示不感兴趣二次确认弹窗
+      pendingExclude: null // 当前待确认不感兴趣的用户数据 { item, index }
     }
   },
   computed: {
@@ -242,6 +269,46 @@ export default {
       uni.navigateTo({
         url: `/pages-sub/explore/staff-detail/index?staffInfo=${staffInfo}&prodName=${keyword}`
       })
+    },
+
+    // ----------- 点击不感兴趣：打开自定义确认弹窗
+    openExcludeDialog(item, index) {
+      // 接口返回字段可能是大写 UserId，兼容取值
+      const userId = item.UserId || item.userId
+      if (!userId) {
+        uni.showToast({ title: '缺少用户标识', icon: 'none' })
+        return
+      }
+      // 缓存待操作数据并打开弹窗
+      this.pendingExclude = { item, index, userId }
+      this.showExcludeDialog = true
+    },
+
+    // ----------- 关闭不感兴趣弹窗
+    closeExcludeDialog() {
+      this.showExcludeDialog = false
+      this.pendingExclude = null
+    },
+
+    // ----------- 确认不感兴趣：调用 excludeUser 接口并从推荐列表移除
+    async confirmExclude() {
+      if (!this.pendingExclude) return
+      const { index, userId } = this.pendingExclude
+      try {
+        uni.showLoading({ title: '处理中...', mask: true })
+        // 调用不感兴趣接口，参数为 excludeUserId
+        await excludeUser({ excludeUserId: userId })
+        uni.hideLoading()
+        // 接口成功后从推荐列表中移除该卡片
+        this.recommendList.splice(index, 1)
+        this.showExcludeDialog = false
+        this.pendingExclude = null
+        uni.showToast({ title: '操作成功', icon: 'success' })
+      } catch (e) {
+        uni.hideLoading()
+        console.log('不感兴趣操作失败', e)
+        uni.showToast({ title: '操作失败，请重试', icon: 'none' })
+      }
     },
 
     // ----------- 头像加载失败：清空 userLogo，让模板回退到默认性别头像
@@ -350,7 +417,7 @@ export default {
 // ==================== 顶部控制面板（与探客页保持一致）
 .control-card {
   position: sticky;
-  top: 0;
+  top: 12rpx;
   z-index: 10;
   margin: 0 24rpx 22rpx;
   padding: 24rpx;
@@ -373,7 +440,7 @@ export default {
   border-radius: 20rpx;
   padding: 24rpx;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 20rpx;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
   border: 1rpx solid rgba(0, 0, 0, 0.04);
@@ -491,12 +558,17 @@ export default {
   }
 }
 
-// 右侧距离标签 + 箭头
+// 右侧距离标签 + 不感兴趣
 .comp-right {
   display: flex;
-  align-items: center;
-  gap: 8rpx;
+  flex-direction: column;
+  align-items: flex-end;
   flex-shrink: 0;
+  min-height: 100%;
+
+  .comp-right-spacer {
+    flex: 1;
+  }
 
   .distance-tag {
     background: #fff4d6;
@@ -507,9 +579,24 @@ export default {
     line-height: 1;
   }
 
-  .arrow-right {
-    font-size: 32rpx;
-    color: #bbb;
+  .comp-right-bottom {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .not-interested-btn {
+    font-size: 20rpx;
+    color: #999;
+    padding: 6rpx 12rpx;
+    border: 1rpx solid #e0e0e0;
+    border-radius: 40rpx;
+    background: #f9f9f9;
+    line-height: 1;
+
+    &:active {
+      background: #f0f0f0;
+    }
   }
 }
 
@@ -699,5 +786,79 @@ export default {
     background: #ff4d4f;
     border: 2rpx solid #fff;
   }
+}
+
+// ==================== 不感兴趣二次确认弹窗
+.exclude-dialog-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .exclude-dialog-card {
+    width: 500rpx;
+    background: #fff;
+    border-radius: 28rpx;
+    padding: 48rpx 40rpx 40rpx;
+    text-align: center;
+    box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.15);
+    animation: dialogScale 0.2s ease-out;
+
+    .exclude-dialog-title {
+      font-size: 34rpx;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 24rpx;
+    }
+
+    .exclude-dialog-content {
+      font-size: 30rpx;
+      color: #666;
+      line-height: 1.5;
+      margin-bottom: 48rpx;
+    }
+
+    .exclude-dialog-actions {
+      display: flex;
+      align-items: center;
+      gap: 24rpx;
+
+      .exclude-dialog-btn {
+        flex: 1;
+        height: 84rpx;
+        line-height: 84rpx;
+        border-radius: 16rpx;
+        font-size: 30rpx;
+        font-weight: 500;
+        text-align: center;
+
+        &.cancel {
+          background: #f2f3f5;
+          color: #666;
+        }
+
+        &.confirm {
+          background: linear-gradient(135deg, #ff5a5a 0%, #ff4d4f 100%);
+          color: #fff;
+          box-shadow: 0 8rpx 24rpx rgba(255, 77, 79, 0.25);
+        }
+
+        &:active {
+          opacity: 0.85;
+        }
+      }
+    }
+  }
+}
+
+@keyframes dialogScale {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 </style>

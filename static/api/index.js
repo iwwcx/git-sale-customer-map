@@ -341,6 +341,16 @@ export function searchUsersByProduct(params) {
   });
 }
 
+// 添加不感兴趣用户
+export function excludeUser(data) {
+  return request({
+    url: '/tanke/excludeUser',
+    method: 'post',
+    data,
+    apiKey: 'api80'
+  });
+}
+
 // 获取深度工商信息
 export function searchEnterprise(params) {
   return request({
