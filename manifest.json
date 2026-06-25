@@ -56,6 +56,8 @@
         "setting" : {
             "urlCheck" : false
         },
+        "enableShareAppMessage" : true,
+        "enableShareTimeline" : true,
         "usingComponents" : true,
         "permission" : {
             "scope.userLocation" : {

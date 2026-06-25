@@ -256,7 +256,7 @@
 </template>
 
 <script>
-import { tankeLogin, searchCompany, tankeRegister, getMemberInfo, bindInvite } from '@/static/api/index.js'
+import { tankeLogin, searchCompany, tankeRegister, getMemberInfo, bindInvite, getInvite } from '@/static/api/index.js'
 import { getProductImageUrlChat } from '@/common/utils/index.js'
 import { showName } from '@/common/utils/index.js'
 
@@ -533,8 +533,17 @@ export default {
 
     // ----------- 确认填写邀请人手机号并调用接口
     onConfirmInvite() {
-      if (!this.registeredUserData) return
       const phone = this.invitePhone.trim()
+      // 未填写手机号拦截
+      if (!phone) {
+        uni.showToast({ title: '请输入邀请人手机号', icon: 'none' })
+        return
+      }
+      // 校验手机号格式
+      if (!/^1[3-9]\d{9}$/.test(phone)) {
+        uni.showToast({ title: '请输入正确的手机号', icon: 'none' })
+        return
+      }
       // 先保存登录信息（写入 token，bindInvite 需要认证）
       this.saveLoginInfo(this.registeredUserData).then(() => {
         // 有填写才调接口，空值直接完成登录
@@ -596,6 +605,17 @@ export default {
     // ----------- 保存登录信息并跳转（供非邀请流程复用）
     async applyLogin(data) {
       await this.saveLoginInfo(data)
+      // 登录后检查是否已填写邀请人，未填则弹出邀请弹窗
+      try {
+        const res = await getInvite()
+        if (res && res.data && !res.data.isInvite) {
+          this.registeredUserData = data
+          this.showInviteModal = true
+          return
+        }
+      } catch (e) {
+        // 接口异常静默处理，继续完成登录
+      }
       this.completeLogin()
     },
 

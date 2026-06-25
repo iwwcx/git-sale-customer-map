@@ -311,6 +311,19 @@
 
       <view class="menu-divider"></view>
 
+      <view class="menu-item" @tap="goPage('aiReport')">
+        <view class="menu-icon icon-cyan">
+          <text class="icon-emoji">📊</text>
+        </view>
+        <view class="menu-content">
+          <view class="menu-title">我的AI报告</view>
+          <view class="menu-desc">查看已生成的AI分析报告记录</view>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <view class="menu-divider"></view>
+
       <view class="menu-item" @tap="goPage('settings')">
         <view class="menu-icon icon-purple">
           <text class="icon-emoji">⚙️</text>
@@ -787,6 +800,7 @@ export default {
         invite: '/pages-sub/mine/invite/index',
         customerList: '/pages-sub/mine/customer/index',
         paymentInfo: '/pages-sub/mine/payment/index',
+        aiReport: '/pages-sub/mine/ai-report/index',
         settings: '/pages-sub/mine/settings/index'
       }
       if (routes[type]) {

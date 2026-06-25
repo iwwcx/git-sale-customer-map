@@ -391,5 +391,25 @@ export function deepseekQuery(data) {
   });
 }
 
+// 我的AI报告列表
+export function getAiReportList(params) {
+  return request({
+    url: '/tanke/aiReportList',
+    method: 'get',
+    params,
+    apiKey: 'api80'
+  });
+}
+
+// AI报告详情
+export function getAiReportDetail(params) {
+  return request({
+    url: '/tanke/aiReportDetail',
+    method: 'get',
+    params,
+    apiKey: 'api80'
+  });
+}
+
 
 

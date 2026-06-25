@@ -152,6 +152,18 @@
 				"style": {
 					"navigationBarTitleText": "添加邀请人"
 				}
+			},
+			{
+				"path": "ai-report/index",
+				"style": {
+					"navigationBarTitleText": "我的AI报告"
+				}
+			},
+			{
+				"path": "ai-report/detail",
+				"style": {
+					"navigationBarTitleText": "AI分析报告详情"
+				}
 			}
 		]
 	}, {

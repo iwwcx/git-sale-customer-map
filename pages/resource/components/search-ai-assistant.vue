@@ -72,7 +72,7 @@
           <!-- 能力数据 -->
           <view class="insight-stats animate-in" style="animation-delay: 0.5s">
             <view class="stat-item">
-              <text class="stat-num">2000<text class="stat-unit">+</text></text>
+              <text class="stat-num">20万<text class="stat-unit">+</text></text>
               <text class="stat-label">企业扫描</text>
             </view>
             <view class="stat-divider"></view>
@@ -218,23 +218,11 @@
               <text class="sec-title">快速分析</text>
             </view>
             <view class="quick-wrap">
-              <text class="quick-hint">试试这些关键词 →</text>
+              <text class="quick-hint">试试这些常用关键词 →</text>
               <view class="quick-chips">
-                <view class="chip" @tap="onTagTap('减速机')">
+                <view class="chip" v-for="tag in quickTags" :key="tag" @tap="onTagTap(tag)">
                   <text class="chip-icon">🔍</text>
-                  <text class="chip-text">减速机</text>
-                </view>
-                <view class="chip" @tap="onTagTap('齿轮')">
-                  <text class="chip-icon">🔍</text>
-                  <text class="chip-text">齿轮</text>
-                </view>
-                <view class="chip" @tap="onTagTap('导轨')">
-                  <text class="chip-icon">🔍</text>
-                  <text class="chip-text">导轨</text>
-                </view>
-                <view class="chip" @tap="onTagTap('轴承')">
-                  <text class="chip-icon">🔍</text>
-                  <text class="chip-text">轴承</text>
+                  <text class="chip-text">{{ tag }}</text>
                 </view>
               </view>
             </view>
@@ -259,7 +247,7 @@
               <view class="dh-grid-item dg-blue">
                 <view class="dg-ico-circle"><text class="dg-ico">📍</text></view>
                 <text class="dg-label">当前定位</text>
-                <text class="dg-val">附近搜索</text>
+                <text class="dg-val">附近<text style="color: red;">5km</text>搜索</text>
               </view>
               <view class="dh-grid-item dg-green">
                 <view class="dg-ico-circle"><text class="dg-ico">👥</text></view>
@@ -386,7 +374,8 @@ export default {
       reportSections: [], // 解析后的报告分区数据
       showLoading: false,
       searchKeyword: '', // 产品名搜索关键词
-      keyword: ""
+      keyword: "",
+      quickTags: ['减速机', '电缸', '模组', '导轨', '铝型材', '电机', '气动', '液压', '五金件'] // 快捷关键词列表
     }
   },
   computed: {
@@ -427,7 +416,6 @@ export default {
       this.keyword = tag
       this.fetchAiData([tag])
     },
-
     // ----------- 生成 AI 分析报告，products 为空时取用户配置的关键词
     async fetchAiData(products) {
       try {
@@ -440,7 +428,8 @@ export default {
         const res = await deepseekQuery({
           interestedProducts: keywords,
           lat: uni.getStorageSync('myLatitude'),
-          lng: uni.getStorageSync('myLongitude')
+          lng: uni.getStorageSync('myLongitude'),
+          distance: 5000
         })
         console.log('AI原始返回:', res?.data?.report)
         const raw = res?.data?.report || ''
@@ -1882,6 +1871,7 @@ $muted: #6b7896;
 
 /* 三级小标题 */
 .sub-title {
+  margin-top: 16rpx;
   display: inline-flex;
   align-items: center;
   padding: 10rpx 22rpx 10rpx 16rpx;
@@ -1919,7 +1909,7 @@ $muted: #6b7896;
   text-align: justify;
 
   .seg-bold {
-    color: #334155;
+    color: #1387ff;
     font-weight: 600;
   }
 
@@ -1958,7 +1948,7 @@ $muted: #6b7896;
       color: #394353;
 
       .seg-bold {
-        color: #334155;
+        color: #1387ff;
         font-weight: 600;
       }
 
