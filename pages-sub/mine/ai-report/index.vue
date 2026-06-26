@@ -606,8 +606,8 @@ page {
 }
 
 .rc-time {
-  font-size: 22rpx;
-  color: #94a3b8;
+  font-size: 26rpx;
+  color: #5e6a7c;
 }
 
 .rc-title {

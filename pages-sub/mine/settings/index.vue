@@ -48,24 +48,24 @@
         <!-- 主开关：只显示企业 -->
         <view class="switch-row">
           <text class="switch-label">只显示企业</text>
-          <switch :checked="showOnlyEnterprise" color="#2962ff" style="transform:scale(0.85)" @change="onShowOnlyEnterpriseChange" />
+          <switch :key="'ent' + showOnlyEnterprise" :checked="showOnlyEnterprise" color="#2962ff" style="transform:scale(0.85)" @change="onShowOnlyEnterpriseChange" />
         </view>
 
         <!-- 企业子开关（缩进显示） -->
         <view class="switch-row switch-row-child" :class="{ 'row-disabled': !showOnlyEnterprise }">
           <text class="switch-label sub-label" :class="{ 'text-disabled': !showOnlyEnterprise }">只显示主机企业</text>
-          <switch :checked="showOnlyHostEnterprise" color="#2962ff" style="transform:scale(0.85)" :disabled="!showOnlyEnterprise" @change="onShowOnlyHostEnterpriseChange" />
+          <switch :key="'host' + showOnlyHostEnterprise" :checked="showOnlyHostEnterprise" color="#2962ff" style="transform:scale(0.85)" :disabled="!showOnlyEnterprise" @change="onShowOnlyHostEnterpriseChange" />
         </view>
 
         <view class="switch-row switch-row-child" :class="{ 'row-disabled': !showOnlyEnterprise }">
           <text class="switch-label sub-label" :class="{ 'text-disabled': !showOnlyEnterprise }">只显示零部件企业</text>
-          <switch :checked="showOnlyPartsEnterprise" color="#2962ff" style="transform:scale(0.85)" :disabled="!showOnlyEnterprise" @change="onShowOnlyPartsEnterpriseChange" />
+          <switch :key="'parts' + showOnlyPartsEnterprise" :checked="showOnlyPartsEnterprise" color="#2962ff" style="transform:scale(0.85)" :disabled="!showOnlyEnterprise" @change="onShowOnlyPartsEnterpriseChange" />
         </view>
 
         <!-- 主开关：只显示院校 -->
         <view class="switch-row">
           <text class="switch-label">只显示院校</text>
-          <switch :checked="showOnlySchool" color="#2962ff" style="transform:scale(0.85)" @change="onShowOnlySchoolChange" />
+          <switch :key="'school' + showOnlySchool" :checked="showOnlySchool" color="#2962ff" style="transform:scale(0.85)" @change="onShowOnlySchoolChange" />
         </view>
       </view>
     </view>
@@ -248,17 +248,18 @@ export default {
     onShowOnlyEnterpriseChange(e) {
       const isChecked = e.detail.value
       if (isChecked) {
-        // 打开只显示企业，关闭只显示院校
+        // 打开只显示企业：与只显示院校互斥，关闭院校
         this.showOnlyEnterprise = true
         this.showOnlySchool = false
+        // 默认打开只显示主机企业，并关闭零部件企业（两者互斥）
         this.showOnlyHostEnterprise = true
+        this.showOnlyPartsEnterprise = false
       } else {
-        // 关闭只显示企业时，强制打开只显示院校（保证至少选一个）
+        // 关闭只显示企业：子开关（主机/零部件）一并关闭
         this.showOnlyEnterprise = false
-        this.showOnlySchool = true
-        // 同时关闭企业子开关
         this.showOnlyHostEnterprise = false
         this.showOnlyPartsEnterprise = false
+        this.showOnlySchool = true;
       }
       this.saveConfig()
     },
@@ -267,16 +268,17 @@ export default {
     onShowOnlySchoolChange(e) {
       const isChecked = e.detail.value
       if (isChecked) {
-        // 打开只显示院校，关闭只显示企业
+        // 打开只显示院校：与只显示企业互斥，关闭企业及其子开关
         this.showOnlySchool = true
         this.showOnlyEnterprise = false
-        // 同时关闭企业子开关
         this.showOnlyHostEnterprise = false
         this.showOnlyPartsEnterprise = false
       } else {
-        // 关闭只显示院校时，强制打开只显示企业（保证至少选一个）
+        // 关闭只显示院校：自动切到只显示企业，并默认打开只显示主机企业
         this.showOnlySchool = false
         this.showOnlyEnterprise = true
+        this.showOnlyHostEnterprise = true
+        this.showOnlyPartsEnterprise = false
       }
       this.saveConfig()
     },

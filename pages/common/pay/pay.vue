@@ -457,7 +457,7 @@ export default {
     // 维护开关
     showUnderMaintenance() {
       const now = new Date()
-      const deadline = new Date(2026, 5, 18, 12, 0, 0)
+      const deadline = new Date(2026, 5, 25, 12, 0, 0)
       return now.getTime() < deadline.getTime()
     }
   },
