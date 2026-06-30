@@ -107,10 +107,10 @@
         <view class="plan-price">
           <view class="price-row">
             <text class="price-symbol">¥</text>
-            <text class="price-num">1980</text>
+            <text class="price-num">2980</text>
           </view>
           <view class="price-meta">
-            <text class="price-origin">¥2599</text>
+            <text class="price-origin">¥3599</text>
             <text class="price-unit">/ 年</text>
           </view>
         </view>
@@ -185,12 +185,12 @@
       <!-- <view class="bar-left">
         <view class="bar-amount-row">
           <text class="bar-symbol">¥</text>
-          <text class="bar-amount">1980</text>
-          <text class="bar-origin">¥2599</text>
+          <text class="bar-amount">2980</text>
+          <text class="bar-origin">¥3599</text>
         </view>
         <text class="bar-label">已优惠 ¥619</text>
       </view> -->
-      <view class="service-phone">客服热线：18921972378</view>
+      <view class="service-phone">客服热线：19819976695</view>
       <view class="bar-btn" :class="{ disabled: !agreed }" @tap="onContactTap">
         <text class="btn-text">{{ isOfficialMember ? '联系客服续费会员（微信同号）' : '联系客服成为会员（微信同号）' }}</text>
       </view>
@@ -225,11 +225,11 @@
                 <view class="plan-badge personal-badge">个人会员</view>
                 <view class="plan-amount">
                   <text class="amount-symbol">¥</text>
-                  <text class="amount-num">1980</text>
+                  <text class="amount-num">2980</text>
                   <text class="amount-unit">/年</text>
                 </view>
               </view>
-              <text class="plan-tab-desc">适合个人用户使用</text>
+              <text class="plan-tab-desc">适合销售人员个人使用</text>
             </view>
 
             <view class="plan-tab enterprise">
@@ -238,11 +238,11 @@
                 <view class="plan-badge enterprise-badge">企业会员</view>
                 <view class="plan-amount enterprise-amount">
                   <text class="amount-symbol">¥</text>
-                  <text class="amount-num">19800</text>
+                  <text class="amount-num">29800</text>
                   <text class="amount-unit">/年</text>
                 </view>
               </view>
-              <text class="plan-tab-desc">含 20 个账号 · 超出 +680 元/账号/年</text>
+              <text class="plan-tab-desc">适合企业直接集中购买</text>
             </view>
           </view>
 
@@ -457,7 +457,7 @@ export default {
     // 维护开关
     showUnderMaintenance() {
       const now = new Date()
-      const deadline = new Date(2026, 5, 25, 12, 0, 0)
+      const deadline = new Date(2026, 5, 20, 12, 0, 0)
       return now.getTime() < deadline.getTime()
     }
   },
@@ -483,7 +483,7 @@ export default {
     // ----------- 点击联系客服：直接拨打电话
     onContactTap() {
       uni.makePhoneCall({
-        phoneNumber: '18921972378',
+        phoneNumber: '19819976695',
         fail: () => {
           uni.showToast({ title: '拨打失败', icon: 'none' })
         }

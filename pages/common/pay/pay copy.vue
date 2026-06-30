@@ -180,7 +180,7 @@
                   <text class="amount-unit">/年</text>
                 </view>
               </view>
-              <text class="plan-tab-desc">适合个人用户使用</text>
+              <text class="plan-tab-desc">适合销售人员个人使用</text>
             </view>
 
             <view class="plan-tab enterprise">
@@ -193,7 +193,7 @@
                   <text class="amount-unit">/年</text>
                 </view>
               </view>
-              <text class="plan-tab-desc">含 20 个账号 · 超出 +680 元/账号/年</text>
+              <text class="plan-tab-desc">适合企业直接集中购买</text>
             </view>
           </view>
 

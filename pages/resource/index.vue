@@ -12,7 +12,7 @@
           <view class="tab-item" :class="{ active: currentTab === 'product' }" @tap="changeTab('product')">搜产品需求</view>
           <view class="tab-item" :class="{ active: currentTab === 'company' }" @tap="changeTab('company')">搜企业</view>
           <view class="tab-item" :class="{ active: currentTab === 'engineer' }" @tap="changeTab('engineer')">搜工程师</view>
-          <view class="tab-item" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
+          <view class="tab-item ai" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
         </view>
       </template>
     </search-product>
@@ -24,7 +24,7 @@
           <view class="tab-item" :class="{ active: currentTab === 'product' }" @tap="changeTab('product')">搜产品需求</view>
           <view class="tab-item" :class="{ active: currentTab === 'company' }" @tap="changeTab('company')">搜企业</view>
           <view class="tab-item" :class="{ active: currentTab === 'engineer' }" @tap="changeTab('engineer')">搜工程师</view>
-          <view class="tab-item" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
+          <view class="tab-item ai" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
         </view>
       </template>
     </search-company>
@@ -36,7 +36,7 @@
           <view class="tab-item" :class="{ active: currentTab === 'product' }" @tap="changeTab('product')">搜产品需求</view>
           <view class="tab-item" :class="{ active: currentTab === 'company' }" @tap="changeTab('company')">搜企业</view>
           <view class="tab-item" :class="{ active: currentTab === 'engineer' }" @tap="changeTab('engineer')">搜工程师</view>
-          <view class="tab-item" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
+          <view class="tab-item ai" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
         </view>
       </template>
     </search-engineer>
@@ -48,7 +48,7 @@
           <view class="tab-item" :class="{ active: currentTab === 'product' }" @tap="changeTab('product')">搜产品需求</view>
           <view class="tab-item" :class="{ active: currentTab === 'company' }" @tap="changeTab('company')">搜企业</view>
           <view class="tab-item" :class="{ active: currentTab === 'engineer' }" @tap="changeTab('engineer')">搜工程师</view>
-          <view class="tab-item" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
+          <view class="tab-item ai" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
         </view>
       </template>
     </search-ai-assistant>
@@ -176,6 +176,20 @@ export default {
         border-radius: 6rpx;
         background: #2f73ff;
         transform: translateX(-50%);
+      }
+    }
+
+    // AI助手菜单：红色高亮
+    &.ai {
+      color: #ff4d4f;
+      font-weight: 600;
+      
+      &.active {
+        color: #ff4d4f;
+
+        &::after {
+          background: #ff4d4f;
+        }
       }
     }
   }

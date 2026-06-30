@@ -126,13 +126,18 @@
     <view class="benefit-tip-card" v-if="!isOfficialMember" @tap="showMemberTipModal">
       <view class="benefit-card-inner">
         <view class="benefit-card-left">
-          <text class="benefit-card-icon">💡</text>
+          <view class="benefit-card-badge">
+            <text class="benefit-card-icon">💡</text>
+          </view>
           <view class="benefit-card-text">
             <text class="benefit-card-title">会员权益说明</text>
-            <text class="benefit-card-sub">点击查看详情</text>
+            <text class="benefit-card-sub">了解您的专属权益与服务</text>
           </view>
         </view>
-        <view class="benefit-card-arrow">›</view>
+        <view class="benefit-card-btn">
+          <text class="benefit-card-btn-text">查看</text>
+          <text class="benefit-card-arrow">›</text>
+        </view>
       </view>
     </view>
 
@@ -183,23 +188,23 @@
               <text class="tip-section-icon">🎯</text>
               <text>成为认证推荐官</text>
             </view>
-            <text class="tip-section-text">成为正式会员后，可申请成为认证推荐官。审核通过后，有权<text style="color: yellow;">直接收取客户的服务年费</text>，然后根据结算规则支付代理费用即可。</text>
+            <text class="tip-section-text">成为正式会员后，可申请成为认证推荐官。具体申请规则您可以<text style="color: yellow;">向您的推荐人直接咨询。</text>经推荐人推荐审核通过后，<text style="color: yellow;">您即可有权直接收取客户的服务年费</text>，然后根据结算规则支付代理费用即可。</text>
           </view>
 
-          <view class="tip-section highlight-section">
+          <!-- <view class="tip-section highlight-section">
             <view class="tip-section-title">
               <text class="tip-section-icon">💰</text>
               <text>长期收益</text>
             </view>
             <text class="tip-section-text">如果您的客户每年续费，那么您的收益将会越来越大！</text>
-          </view>
+          </view> -->
 
           <view class="tip-section contact-section">
             <view class="tip-section-title">
               <text class="tip-section-icon">📞</text>
               <text>咨询客服</text>
             </view>
-            <text class="tip-section-text">联系电话：18921972378（微信同号）</text>
+            <text class="tip-section-text">联系电话：19819976695（微信同号）</text>
           </view>
         </view>
 
@@ -381,11 +386,11 @@
               <view class="plan-badge personal-badge">个人会员</view>
               <view class="plan-amount">
                 <text class="amount-symbol">¥</text>
-                <text class="amount-num">1980</text>
+                <text class="amount-num">2980</text>
                 <text class="amount-unit">/年</text>
               </view>
             </view>
-            <text class="plan-tab-desc">适合个人用户使用</text>
+            <text class="plan-tab-desc">适合销售人员个人使用</text>
           </view>
 
           <view class="plan-tab enterprise">
@@ -394,11 +399,11 @@
               <view class="plan-badge enterprise-badge">企业会员</view>
               <view class="plan-amount enterprise-amount">
                 <text class="amount-symbol">¥</text>
-                <text class="amount-num">19800</text>
+                <text class="amount-num">29800</text>
                 <text class="amount-unit">/年</text>
               </view>
             </view>
-            <text class="plan-tab-desc">含 20 个账号 · 超出 +680 元/账号/年</text>
+            <text class="plan-tab-desc">适合企业直接集中购买</text>
           </view>
         </view>
 
@@ -2167,6 +2172,7 @@ export default {
   animation: cardFloat 3s ease-in-out infinite;
   position: relative;
   box-shadow: 0 4rpx 20rpx rgba(91, 139, 212, 0.2);
+  border: 1px solid #fbe4ff;
 
   // 光晕背景
   &::before {
@@ -2187,23 +2193,23 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 32rpx 36rpx;
-    background: #ffffff;
-    box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+    padding: 30rpx 32rpx;
+    // 柔和的紫蓝渐变底色，延续页面主题，不刺眼
+    background: linear-gradient(135deg, #eef2ff 0%, #f4f0ff 50%, #eaf1ff 100%);
+    box-shadow: 0 4rpx 16rpx rgba(99, 102, 241, 0.12);
     border-radius: 24rpx;
     overflow: hidden;
     z-index: 1;
-    border: 1rpx solid rgba(47, 115, 255, 0.08);
 
-    // 左侧装饰圆
+    // 右上角装饰光晕
     &::after {
       content: '';
       position: absolute;
-      top: -20rpx;
-      left: -20rpx;
-      width: 80rpx;
-      height: 80rpx;
-      background: radial-gradient(circle, rgba(47, 115, 255, 0.1) 0%, transparent 70%);
+      top: -40rpx;
+      right: -30rpx;
+      width: 140rpx;
+      height: 140rpx;
+      background: radial-gradient(circle, rgba(124, 131, 236, 0.18) 0%, transparent 70%);
       border-radius: 50%;
       animation: glowPulse 3s ease-in-out infinite;
     }
@@ -2212,15 +2218,27 @@ export default {
   .benefit-card-left {
     display: flex;
     align-items: center;
-    gap: 24rpx;
+    gap: 22rpx;
     position: relative;
     z-index: 1;
   }
 
+  // 图标徽章，圆形渐变底衬托图标
+  .benefit-card-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 76rpx;
+    height: 76rpx;
+    border-radius: 22rpx;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    box-shadow: 0 4rpx 12rpx rgba(251, 191, 36, 0.3);
+    flex-shrink: 0;
+  }
+
   .benefit-card-icon {
-    font-size: 48rpx;
+    font-size: 42rpx;
     animation: iconBounce 2s ease-in-out infinite;
-    filter: drop-shadow(0 2rpx 8rpx rgba(47, 115, 255, 0.25));
   }
 
   .benefit-card-text {
@@ -2230,24 +2248,44 @@ export default {
   }
 
   .benefit-card-title {
-    font-size: 28rpx;
+    font-size: 30rpx;
     font-weight: 700;
-    color: #1a5fe0;
-    letter-spacing: 2rpx;
-    margin-bottom: 6rpx;
+    color: #4338ca;
+    letter-spacing: 1rpx;
+    margin-bottom: 4rpx;
   }
 
   .benefit-card-sub {
+    font-size: 23rpx;
+    color: #7c7f99;
+    letter-spacing: 0.5rpx;
+  }
+
+  // 右侧"查看"胶囊按钮
+  .benefit-card-btn {
+    display: flex;
+    align-items: center;
+    gap: 4rpx;
+    padding: 10rpx 22rpx;
+    border-radius: 100rpx;
+    background: linear-gradient(135deg, #7c83ec 0%, #6366f1 100%);
+    box-shadow: 0 4rpx 12rpx rgba(99, 102, 241, 0.3);
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+
+  .benefit-card-btn-text {
     font-size: 24rpx;
-    color: #5b6470;
+    font-weight: 600;
+    color: #ffffff;
     letter-spacing: 1rpx;
   }
 
   .benefit-card-arrow {
-    font-size: 36rpx;
-    color: #2f73ff;
-    animation: arrowSlide 1.5s ease-in-out infinite;
-    opacity: 0.8;
+    font-size: 30rpx;
+    color: #ffffff;
+    line-height: 1;
   }
 
   &:active .benefit-card-inner {

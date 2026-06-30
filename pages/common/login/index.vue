@@ -178,7 +178,14 @@
         </view>
         <view class="skip-modal-actions">
           <view class="skip-btn cancel" @tap="onCancelSkip">取消</view>
-          <view class="skip-btn confirm" @tap="onConfirmSkip">确定</view>
+          <!-- 确定按钮使用 button 重新触发 getPhoneNumber，获取新的一次性 code 用于注册 -->
+          <button
+            class="skip-btn confirm"
+            :disabled="registering"
+            :class="{ disabled: registering }"
+            open-type="getPhoneNumber"
+            @getphonenumber="onConfirmSkip"
+          >{{ registering ? '注册中...' : '确定' }}</button>
         </view>
       </view>
     </view>
@@ -383,20 +390,39 @@ export default {
       this.showSkipConfirm = false
     },
 
-    // ----------- 确认跳过公司选择
-    onConfirmSkip() {
+    // ----------- 确认跳过公司选择（getPhoneNumber 回调），重新拿手机号 code 调注册
+    onConfirmSkip(e) {
+      if (this.registering) return
+      // getPhoneNumber 用户拒绝授权
+      if (!e || !e.detail || e.detail.errMsg !== 'getPhoneNumber:ok' || !e.detail.code) {
+        uni.showToast({ title: '已取消授权', icon: 'none' })
+        return
+      }
+      const newCode = e.detail.code // 一次性的新手机号 code，用于注册
       this.showSkipConfirm = false
-      this.doRegisterWithDefaultCompany()
+      // 先确保 wx session 有效，避免后端解密手机号失败
+      uni.checkSession({
+        success: () => {
+          this.doRegisterWithDefaultCompany(newCode)
+        },
+        fail: () => {
+          uni.login({
+            provider: 'weixin',
+            success: () => {
+              this.doRegisterWithDefaultCompany(newCode)
+            },
+            fail: () => {
+              uni.showToast({ title: '微信登录失败', icon: 'none' })
+            }
+          })
+        }
+      })
     },
 
     // ----------- 调用注册接口（跳过公司选择，使用系统默认公司）
-    doRegisterWithDefaultCompany() {
-      if (!this.phoneCode) {
-        uni.showToast({ title: '登录信息过期，请重试', icon: 'none' })
-        return
-      }
+    doRegisterWithDefaultCompany(code) {
       this.registering = true
-      tankeRegister({ code: this.phoneCode, companyName: "杭州精玖标准件有限公司" }).then((res) => {
+      tankeRegister({ code, companyName: "杭州精玖标准件有限公司" }).then((res) => {
         this.registering = false
         if (!res || !res.data) {
           uni.showToast({ title: (res && res.massage) || '注册失败', icon: 'none' })
@@ -1249,11 +1275,19 @@ export default {
       .skip-btn {
         flex: 1;
         height: 88rpx;
+        line-height: 88rpx;
+        padding: 0;
         border-radius: 44rpx;
         font-size: 30rpx;
         display: flex;
         align-items: center;
         justify-content: center;
+        border: none;
+
+        // button 自带的伪边框去掉
+        &::after {
+          border: none;
+        }
 
         &.cancel {
           background: #f4f6fa;
@@ -1270,6 +1304,14 @@ export default {
           color: #fff;
           font-weight: 600;
           box-shadow: 0 8rpx 20rpx rgba(41, 98, 255, 0.3);
+
+          &.disabled,
+          &[disabled] {
+            opacity: 0.45;
+            box-shadow: none;
+            color: #fff;
+            background: linear-gradient(135deg, #4f8eff 0%, #2962ff 100%);
+          }
 
           &:active {
             opacity: 0.88;

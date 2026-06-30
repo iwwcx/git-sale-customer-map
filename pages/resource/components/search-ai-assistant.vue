@@ -22,7 +22,7 @@
         </view>
 
         <!-- 搜索按钮（右侧） -->
-        <view class="search-btn" @tap="onSearch">搜索</view>
+        <view class="search-btn" @tap="onSearch">AI报告</view>
       </view>
     </view>
 
@@ -361,20 +361,35 @@
       <!-- 仅在结果区域显示 loading -->
       <loading-overlay v-if="showLoading" class="result-loading" :visible="showLoading" text="AI正在为您出分析报告..." />
     </view>
+
+    <!-- 会员引导蒙层：非会员点击搜索时弹出 -->
+    <member-mask
+      v-if="showMemberMask"
+      :visible="true"
+      title="会员专属"
+      sub-title="开通会员后可使用AI智能分析功能"
+      btn-text="去开通"
+      navigate-url="/pages/common/pay/pay"
+      @close="onCloseMemberMask"
+    />
   </view>
 </template>
 
 <script>
 import { deepseekQuery, getUserConfig } from '@/static/api/index.js'
+import { mixinCheckIsMember } from '@/common/utils/member.js'
+import MemberMask from '@/common/components/member-mask.vue'
 
 export default {
   name: 'SearchAiAssistant',
+  components: { MemberMask },
   data() {
     return {
       reportSections: [], // 解析后的报告分区数据
       showLoading: false,
       searchKeyword: '', // 产品名搜索关键词
       keyword: "",
+      showMemberMask: false, // 非会员点击搜索时弹出会员引导蒙层
       quickTags: ['减速机', '电缸', '模组', '导轨', '铝型材', '电机', '气动', '液压', '五金件'] // 快捷关键词列表
     }
   },
@@ -406,15 +421,30 @@ export default {
         uni.showToast({ title: '请输入产品名', icon: 'none' })
         return
       }
+      // 非会员弹出会员引导蒙层，不执行搜索
+      if (!mixinCheckIsMember()) {
+        this.showMemberMask = true
+        return
+      }
       this.keyword = this.searchKeyword
       this.fetchAiData([kw]) // 用输入的产品名作为感兴趣产品
     },
 
     // ----------- 点击热门产品标签：填入并直接搜索
     onTagTap(tag) {
+      // 非会员弹出会员引导蒙层，不执行搜索
+      if (!mixinCheckIsMember()) {
+        this.showMemberMask = true
+        return
+      }
       this.searchKeyword = tag
       this.keyword = tag
       this.fetchAiData([tag])
+    },
+
+    // ----------- 关闭会员引导蒙层
+    onCloseMemberMask() {
+      this.showMemberMask = false
     },
     // ----------- 生成 AI 分析报告，products 为空时取用户配置的关键词
     async fetchAiData(products) {

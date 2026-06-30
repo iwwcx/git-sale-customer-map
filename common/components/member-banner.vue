@@ -42,7 +42,7 @@ export default {
       dialogClosing: false, // 弹窗是否处于关闭动画中
       isInvite: false, // 是否已填写邀请码
       invitePhone: '', // 邀请人手机号
-      servicePhone: '18921972378' // 客服电话
+      servicePhone: '19819976695' // 客服电话
     }
   },
   computed: {
