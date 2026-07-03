@@ -213,7 +213,7 @@
             <text class="tag-dot"></text>
             <text class="tag-text">对公转账 · 安全可信</text>
           </view>
-          <view class="hero-title-main">转账开通会员</view>
+          <view class="hero-title-main">缴费成为会员</view>
           <view class="hero-sub-desc">请选择合适的方案，按下方账户信息汇款</view>
         </view>
 
@@ -242,7 +242,7 @@
                   <text class="amount-unit">/年</text>
                 </view>
               </view>
-              <text class="plan-tab-desc">适合企业直接集中购买</text>
+              <text class="plan-tab-desc">企业集中购买，含15个账号</text>
             </view>
           </view>
 
@@ -457,7 +457,7 @@ export default {
     // 维护开关
     showUnderMaintenance() {
       const now = new Date()
-      const deadline = new Date(2026, 5, 20, 12, 0, 0)
+      const deadline = new Date(2026, 6, 3, 12, 0, 0)
       return now.getTime() < deadline.getTime()
     }
   },

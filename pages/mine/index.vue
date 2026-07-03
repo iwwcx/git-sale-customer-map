@@ -59,7 +59,7 @@
           <text class="detail-icon">📞</text>
           <text class="detail-text">{{ userInfo.Phone }}</text>
         </view>
-        <view v-if="isOfficialMember" class="promoter-btn" @tap="goPromoter">
+        <view v-if="isOfficialMember && (!isInvite || canApplyPromoter == 1)" class="promoter-btn" @tap="goPromoter">
           <text class="promoter-icon">{{ promoterStatus == 'approved' ? '🔥' : '💰' }}</text>
           <text class="promoter-text">{{ promoterStatus == 'approved' ? '认证推荐官' : '我想当推荐官'}} </text>
           <view class="promoter-shine"></view>
@@ -234,6 +234,19 @@
 
     <!-- ========== 功能单元格 ========== -->
     <view class="menu-card">
+      <view class="menu-item" @tap="goPage('aiReport')">
+        <view class="menu-icon icon-cyan">
+          <text class="icon-emoji">📊</text>
+        </view>
+        <view class="menu-content">
+          <view class="menu-title">我的AI报告</view>
+          <view class="menu-desc">查看已生成的AI分析报告记录</view>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <view class="menu-divider"></view>
+
       <!-- 没有填写邀请人才展示 -->
       <view v-if="!isInvite && !isOfficialMember" class="menu-item" @tap="goPage('invite')">
         <view class="menu-icon icon-green">
@@ -316,19 +329,6 @@
 
       <view class="menu-divider"></view>
 
-      <view class="menu-item" @tap="goPage('aiReport')">
-        <view class="menu-icon icon-cyan">
-          <text class="icon-emoji">📊</text>
-        </view>
-        <view class="menu-content">
-          <view class="menu-title">我的AI报告</view>
-          <view class="menu-desc">查看已生成的AI分析报告记录</view>
-        </view>
-        <text class="menu-arrow">›</text>
-      </view>
-
-      <view class="menu-divider"></view>
-
       <view class="menu-item" @tap="goPage('settings')">
         <view class="menu-icon icon-purple">
           <text class="icon-emoji">⚙️</text>
@@ -369,7 +369,7 @@
           <text class="tag-dot"></text>
           <text class="tag-text">{{ isOfficialMember ? '会员续费 · 到期提醒' : (inviterPayInfo && inviterPayInfo.companyName ? '对公转账 · 安全可信' : '个人转账 · 快速开通') }}</text>
         </view>
-        <view class="hero-title-main">{{ isOfficialMember ? '会员续费' : '转账开通会员' }}</view>
+        <view class="hero-title-main">{{ isOfficialMember ? '会员续费' : '缴费成为会员' }}</view>
         <view class="hero-sub-desc">
           <block v-if="isOfficialMember && expireTime">
             <text style="color: white;">当前会员到期时间：<text style="color: orange;font-weight: bold;font-size: 28rpx;">{{ expireTime }}</text></text>
@@ -403,7 +403,7 @@
                 <text class="amount-unit">/年</text>
               </view>
             </view>
-            <text class="plan-tab-desc">适合企业直接集中购买</text>
+            <text class="plan-tab-desc">企业集中购买，含15个账号</text>
           </view>
         </view>
 
@@ -468,7 +468,7 @@
 </template>
 
 <script>
-import { getUserMyInfo, followEnterpriseList, followUserList, getChatList, getInvite, getMyPromoterInfo, getInviterPromoterPayInfo } from '@/static/api/index.js'
+import { getUserMyInfo, followEnterpriseList, followUserList, getChatList, getInvite, getMyPromoterInfo, getInviterPromoterPayInfo, getUserConfig } from '@/static/api/index.js'
 import { showName, getProductImageUrl, getProductImageUrlChat } from '@/common/utils/index.js'
 
 export default {
@@ -487,6 +487,7 @@ export default {
       isTrialMember: true,  // 是否是试用用户
       isOfficialMember: true,  // 是否是正式会员用户
       isInvite: false,  // 是否已填写邀请人
+      canApplyPromoter: 0, // 是否允许申请推荐官（getConfig 返回，默认 0）
       promoterStatus: '', // 推广员申请状态 pending=待审核 approved=通过 rejected=拒绝
       myPromoter: '', // 查询我的推广人的状态
       showPromoterPayModal: false, // 是否显示推荐官支付提示弹窗
@@ -515,6 +516,7 @@ export default {
     this.getFollowUserList()
     this.getChatList()
     this.fetchInviteStatus()
+    this.fetchUserConfig()
     this.fetchPromoterStatus()
     this.getInviterPromoterPayInfo()
   },
@@ -679,6 +681,18 @@ export default {
         const res = await getInviterPromoterPayInfo()
         if (res && res.data) {
           this.myPromoter = res.data
+        }
+      } catch (e) {
+        // 接口异常静默处理
+      }
+    },
+
+    // ----------- 获取用户配置（canApplyPromoter 控制申请推荐官入口显隐）
+    async fetchUserConfig() {
+      try {
+        const res = await getUserConfig()
+        if (res && res.data) {
+          this.canApplyPromoter = res.data.canApplyPromoter || 0
         }
       } catch (e) {
         // 接口异常静默处理

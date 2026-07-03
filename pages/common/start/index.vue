@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import { bindShare } from '@/static/api/index.js'
+
 export default {
   data() {
     return {
@@ -24,7 +26,11 @@ export default {
       timer: null
     }
   },
-  onLoad() {
+  onLoad(options) {
+    // 检查是否有分享参数，有的话绑定分享关系
+    if (options && options.shareValue) {
+      this.bindShareRelation(options.shareValue)
+    }
     this.startCountdown()
   },
   onUnload() {
@@ -61,6 +67,15 @@ export default {
       uni.switchTab({
         url: '/pages/map/index'
       })
+    },
+
+    // ----------- 绑定分享关系
+    async bindShareRelation(shareValue) {
+      try {
+        await bindShare({ shareValue })
+      } catch (e) {
+        // 接口异常静默处理
+      }
     }
   }
 }

@@ -128,7 +128,7 @@ export function getUserStandardPartsList(params) {
   });
 }
 
-//  企业工商信息详细
+// 企业工商信息详细
 export function shareCompanyInfo(params) {
   return request({
     url: '/share/companyInfo',
@@ -138,7 +138,7 @@ export function shareCompanyInfo(params) {
   });
 }
 
-//  获取产品分类
+// 获取产品分类
 export function GetClassAllComposes(params) {
   return request({
     url: '/api/Class/GetClassAllComposes',
@@ -295,7 +295,6 @@ export function getUserProfileInfo(params) {
   });
 }
 
-
 // 获取聊天列表
 export function GetChatList(params) {
   return request({
@@ -411,5 +410,23 @@ export function getAiReportDetail(params) {
   });
 }
 
+// ==================== 分享统计相关接口 ====================
 
+// 获取分享标识值
+export function getShareValue() {
+  return request({
+    url: '/tanke/getShareValue',
+    method: 'get',
+    apiKey: 'api80'
+  });
+}
 
+// 绑定分享关系
+export function bindShare(data) {
+  return request({
+    url: '/tanke/bindShare',
+    method: 'post',
+    data,
+    apiKey: 'api80'
+  });
+}
