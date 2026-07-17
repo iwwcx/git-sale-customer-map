@@ -156,13 +156,19 @@
 			{
 				"path": "ai-report/index",
 				"style": {
-					"navigationBarTitleText": "我的AI报告"
+					"navigationBarTitleText": "我的报告"
 				}
 			},
 			{
 				"path": "ai-report/detail",
 				"style": {
-					"navigationBarTitleText": "AI分析报告详情"
+					"navigationBarTitleText": "分析报告详情"
+				}
+			},
+			{
+				"path": "local-leads/index",
+				"style": {
+					"navigationBarTitleText": "我的本地线索"
 				}
 			}
 		]
@@ -177,6 +183,16 @@
 					"app-plus": {
 						"titleNView": false
 					}
+				}
+			}
+		]
+	}, {
+		"root": "pagesCurrency",
+		"pages": [
+			{
+				"path": "pages/product-detail/index",
+				"style": {
+					"navigationBarTitleText": "产品详情"
 				}
 			}
 		]

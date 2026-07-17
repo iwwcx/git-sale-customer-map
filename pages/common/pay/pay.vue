@@ -9,8 +9,8 @@
       </view>
 
       <!-- 标题 -->
-      <text class="maint-title">服务升级中</text>
-      <text class="maint-subtitle">会员开通服务正在升级维护</text>
+      <text class="maint-title">服务开发升级中</text>
+      <text class="maint-subtitle">会员开通服务正在维护开发中</text>
 
       <!-- 分隔线 -->
       <view class="maint-divider"></view>
@@ -456,9 +456,8 @@ export default {
   computed: {
     // 维护开关
     showUnderMaintenance() {
-      const now = new Date()
-      const deadline = new Date(2026, 6, 3, 12, 0, 0)
-      return now.getTime() < deadline.getTime()
+      const openTime = new Date('2026/07/08 16:30:00').getTime()
+      return Date.now() <= openTime
     }
   },
   onShow() {

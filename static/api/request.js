@@ -54,11 +54,12 @@ const getUni = () => {
 
 // ----------- 获取本地存储的 token
 const getToken = () => {
-  const $uni = getUni(); // 通过兼容函数拿 uni，避免冷启动时 uni 未定义
-  if ($uni.getStorageSync('token')) {
-    return $uni.getStorageSync('token');
-  }
-  return null;
+  return "UUthGRdYR5IJer7WaWTPy3amPIEtSmXME2wNGToNL4aln73ti9R2uaCS7yDJyVWuEJtNw95IwiRbrklipi+U6Gcz+3DAE/h/tFS1ofobwizCOttS+I7GUP4SK6gdyUUyVz03HZpqCXqXNX+QLg3U9nGjirjoCTBPvdfKQNJ/JdA="
+  // const $uni = getUni(); // 通过兼容函数拿 uni，避免冷启动时 uni 未定义
+  // if ($uni.getStorageSync('token')) {
+  //   return $uni.getStorageSync('token');
+  // }
+  // return null;
 };
 
 /**

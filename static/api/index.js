@@ -410,6 +410,68 @@ export function getAiReportDetail(params) {
   });
 }
 
+// ==================== 本地线索相关接口 ====================
+
+// 获取本地线索未读数量（角标用）
+export function getLocalLeadsUnreadCount(params) {
+  return request({
+    url: '/tanke/localLeadsUnreadCount',
+    method: 'get',
+    params,
+    apiKey: 'api80'
+  });
+}
+
+// 接收/搜索本地线索（近三天本地下载浏览匹配信息）
+export function receiveLocalLeads(data) {
+  return request({
+    url: '/tanke/receiveLocalLeads',
+    method: 'post',
+    data,
+    apiKey: 'api80'
+  });
+}
+
+// 根据广告搜索用户线索（浏览/下载记录）
+export function searchUsersByAdvert(params) {
+  return request({
+    url: '/tanke/searchUsersByAdvert',
+    method: 'get',
+    params,
+    apiKey: 'api80'
+  });
+}
+
+// 获取历史线索列表（分页）
+export function clueViewList(params) {
+  return request({
+    url: '/tanke/clueViewList',
+    method: 'get',
+    params,
+    apiKey: 'api80'
+  });
+}
+
+// 保存线索到历史记录
+export function saveClueView(data) {
+  return request({
+    url: '/tanke/saveClueView',
+    method: 'post',
+    data,
+    apiKey: 'api80'
+  });
+}
+
+// 删除历史线索
+export function deleteClueView(data) {
+  return request({
+    url: '/tanke/deleteClueView',
+    method: 'post',
+    data,
+    apiKey: 'api80'
+  });
+}
+
 // ==================== 分享统计相关接口 ====================
 
 // 获取分享标识值

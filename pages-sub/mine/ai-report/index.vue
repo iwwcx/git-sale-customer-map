@@ -7,6 +7,13 @@
     </view>
 
     <scroll-view class="page-scroll" scroll-y refresher-enabled :refresher-triggered="refreshing" @refresherrefresh="onRefresh" @scrolltolower="onLoadMore">
+      <!-- ========== 未到开放时间：显示暂无数据 ========== -->
+      <empty-state
+        v-if="!showContent"
+        title="暂无数据"
+      />
+
+      <template v-else>
       <!-- ========== 顶部主视觉 ========== -->
       <view class="hero">
         <view class="hero-row">
@@ -84,7 +91,7 @@
               <text class="rc-status-text">已生成</text>
             </view>
             <view class="rc-no">
-              <text class="rc-no-hash">#</text>
+              <!-- <text class="rc-no-hash">#</text> -->
               <text class="rc-no-num">{{ String(index + 1).padStart(2, '0') }}</text>
             </view>
           </view>
@@ -129,6 +136,7 @@
         title="暂时还没有AI报告"
         hint="生成AI分析报告后，记录会展示在这里。"
       />
+      </template>
     </scroll-view>
   </view>
 </template>
@@ -162,6 +170,11 @@ export default {
     totalKeywords(v) { this.tweenStat('keyword', v) }
   },
   computed: {
+    // ----------- 
+    showContent() {
+      const openTime = new Date('2026/07/08 16:30:00').getTime()
+      return Date.now() >= openTime
+    },
     // ----------- 覆盖企业总数
     totalCompanyCount() {
       return this.list.reduce((sum, item) => sum + (item.company_count || 0), 0)
@@ -173,6 +186,7 @@ export default {
     }
   },
   onLoad() {
+    if (!this.showContent) return
     this.fetchList()
   },
   methods: {

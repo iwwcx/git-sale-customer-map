@@ -180,7 +180,7 @@
               <text class="tip-section-icon">🔥</text>
               <text>正式会员权益</text>
             </view>
-            <text class="tip-section-text">功能全开放，<text style="color: yellow;">无查看次数限制</text>，随时随地联系工程师和企业详细资料。</text>
+            <text class="tip-section-text">功能全开放，<text style="color: yellow;">拥有最大允许查看次数</text>，随时随地联系工程师和企业详细资料。</text>
           </view>
 
           <view class="tip-section">
@@ -234,6 +234,23 @@
 
     <!-- ========== 功能单元格 ========== -->
     <view class="menu-card">
+      <!-- 我的本地线索（带角标） -->
+      <view class="menu-item menu-item-leads" @tap="goPage('localLeads')">
+        <view class="menu-icon icon-amber">
+          <text class="icon-emoji">🎯</text>
+        </view>
+        <view class="menu-content">
+          <view class="menu-title">我的本地线索</view>
+          <view class="menu-desc">本地区匹配您产品关键词的精准需求</view>
+        </view>
+        <view class="leads-badge" v-if="localLeadsUnread > 0">
+          <text class="leads-badge-num">{{ localLeadsUnread > 99 ? '99+' : localLeadsUnread }}</text>
+        </view>
+        <text class="menu-arrow" v-else>›</text>
+      </view>
+
+      <view class="menu-divider"></view>
+
       <view class="menu-item" @tap="goPage('aiReport')">
         <view class="menu-icon icon-cyan">
           <text class="icon-emoji">📊</text>
@@ -468,7 +485,7 @@
 </template>
 
 <script>
-import { getUserMyInfo, followEnterpriseList, followUserList, getChatList, getInvite, getMyPromoterInfo, getInviterPromoterPayInfo, getUserConfig } from '@/static/api/index.js'
+import { getUserMyInfo, followEnterpriseList, followUserList, getChatList, getInvite, getMyPromoterInfo, getInviterPromoterPayInfo, getUserConfig, getLocalLeadsUnreadCount } from '@/static/api/index.js'
 import { showName, getProductImageUrl, getProductImageUrlChat } from '@/common/utils/index.js'
 
 export default {
@@ -493,7 +510,8 @@ export default {
       showPromoterPayModal: false, // 是否显示推荐官支付提示弹窗
       memberTipVisible: false, // 是否显示会员权益说明弹窗
       inviterPayInfo: null, // 邀请人收款信息
-      expireTime: '' // 会员到期时间，正式会员续费弹窗需要展示
+      expireTime: '', // 会员到期时间，正式会员续费弹窗需要展示
+      localLeadsUnread: 0 // 本地线索未读数量（角标显示用）
     }
   },
   onLoad() {
@@ -519,6 +537,7 @@ export default {
     this.fetchUserConfig()
     this.fetchPromoterStatus()
     this.getInviterPromoterPayInfo()
+    this.fetchLocalLeadsUnread()
   },
   methods: {
     // ----------- 跳转推广者申请页
@@ -809,10 +828,23 @@ export default {
       uni.navigateTo({ url: '/pages/common/pay/pay' })
     },
 
+    // ----------- 获取本地线索未读数量（角标用）
+    async fetchLocalLeadsUnread() {
+      try {
+        const res = await getLocalLeadsUnreadCount()
+        if (res && res.data) {
+          this.localLeadsUnread = res.data.unreadCount || 0
+        }
+      } catch (e) {
+        // 接口异常静默处理
+      }
+    },
+
     // ----------- 跳转到指定的功能页
     goPage(type) {
       // type: interestedCompany / interestedEngineer / contactedEngineer
       const routes = {
+        localLeads: '/pages-sub/mine/local-leads/index',
         interestedCompany: '/pages-sub/mine/company/index',
         interestedEngineer: '/pages-sub/mine/user/index',
         contactedEngineer: '/pages-sub/mine/chat/index',
@@ -1346,6 +1378,12 @@ export default {
       &.icon-green {
         background: linear-gradient(135deg, #d1fae5, #a7f3d0);
       }
+
+      // 蓝紫色调（本地线索）
+      &.icon-amber {
+        background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+        box-shadow: 0 4rpx 12rpx rgba(99, 102, 241, 0.13);
+      }
     }
 
     .menu-content {
@@ -1372,6 +1410,28 @@ export default {
       color: #ccc;
       flex-shrink: 0;
       line-height: 1;
+    }
+
+    // 本地线索角标
+    .leads-badge {
+      flex-shrink: 0;
+      min-width: 36rpx;
+      height: 36rpx;
+      padding: 0 10rpx;
+      border-radius: 999rpx;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4rpx 12rpx rgba(99, 102, 241, 0.32);
+      animation: badgePulse 2s ease-in-out infinite;
+
+      .leads-badge-num {
+        font-size: 22rpx;
+        font-weight: 700;
+        color: #fff;
+        line-height: 1;
+      }
     }
   }
 
@@ -2336,6 +2396,12 @@ export default {
 @keyframes arrowSlide {
   0%, 100% { transform: translateX(0); opacity: 0.5; }
   50% { transform: translateX(6rpx); opacity: 0.8; }
+}
+
+// 本地线索角标脉冲
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
 }
 
 // 卡片光斑呼吸动画

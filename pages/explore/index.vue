@@ -186,8 +186,8 @@ export default {
   data() {
     return {
       currentTab: 'company', // 当前激活的 tab，可选值：company / engineer
-      distanceOptions: [0.5, 1, 2, 3, 5], // 距离下拉选项（km）
-      distanceLabels: ['0.5km', '1km', '2km', '3km', '5km'], // 距离下拉选项展示文案（带单位）
+      distanceOptions: [1, 2, 3, 5, 7, 10], // 距离下拉选项（km）
+      distanceLabels: ['1km', '2km', '3km', '5km', '7km', '10km'], // 距离下拉选项展示文案（带单位）
       filterConditions: null,
       distanceIndex: 1,
       companyList: [],
@@ -310,7 +310,7 @@ export default {
           ...this.filterConditions,
           sortBy
         })
-        this.engineerList = res.data?.list || []
+        this.engineerList = (res.data?.list || []).slice(0, 700)
       } catch (e) {
         this.engineerList = []
         uni.showToast({ title: '加载失败，请重试', icon: 'none' })
