@@ -492,3 +492,55 @@ export function bindShare(data) {
     apiKey: 'api80'
   });
 }
+
+// ==================== 收藏公司目录相关接口 ====================
+
+// 获取目录列表
+export function getCompanyDirList(dirCategoryID, dirId = 0) {
+  return request({
+    url: `/dir/${dirCategoryID}/list`,
+    method: 'get',
+    params: { dirId },
+    apiKey: 'api60'
+  });
+}
+
+// 新建目录
+export function addCompanyDir(data) {
+  return request({
+    url: `/dir/${data.OwnerCategoryID}/add`,
+    method: 'post',
+    data,
+    apiKey: 'api60'
+  });
+}
+
+// 批量删除目录
+export function batchDeleteDir(dirCategoryID, dirId) {
+  return request({
+    url: `/dir/${dirCategoryID}/batchdelete`,
+    method: 'post',
+    data: { dirId },
+    apiKey: 'api60'
+  });
+}
+
+// 删除目录内的单条数据
+export function deleteDirData(dataId, dirCategoryId) {
+  return request({
+    url: '/res/del',
+    method: 'post',
+    data: { dataId, dirCategoryId },
+    apiKey: 'profitapi'
+  });
+}
+
+// 把数据添加到指定目录
+export function addDirData(data) {
+  return request({
+    url: '/res/add',
+    method: 'post',
+    data,
+    apiKey: 'profitapi'
+  });
+}

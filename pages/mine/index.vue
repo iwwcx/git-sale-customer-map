@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <view class="page-wrapper">
     <view class="mine-container">
     <!-- ========== 顶部用户信息卡片 ========== -->
@@ -172,7 +172,7 @@
               <text class="tip-section-icon">⭐</text>
               <text>试用会员权益</text>
             </view>
-            <text class="tip-section-text">试用期内，功能开放使用，<text style="color: yellow;">每天可以选看3次工程师信息</text>，您可以认真体验</text>
+            <text class="tip-section-text">试用期内，功能开放使用，<text style="color: yellow;">每天可以选看10次工程师信息</text>，您可以认真体验</text>
           </view>
 
           <view class="tip-section">
@@ -264,6 +264,19 @@
 
       <view class="menu-divider"></view>
 
+      <view class="menu-item" @tap="goPage('shareRecord')">
+        <view class="menu-icon icon-purple">
+          <text class="icon-emoji">🔗</text>
+        </view>
+        <view class="menu-content">
+          <view class="menu-title">我的转发记录</view>
+          <view class="menu-desc">查看你的分享链路与二次转发</view>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <view class="menu-divider"></view>
+
       <!-- 没有填写邀请人才展示 -->
       <view v-if="!isInvite && !isOfficialMember" class="menu-item" @tap="goPage('invite')">
         <view class="menu-icon icon-green">
@@ -276,6 +289,19 @@
         <text class="menu-arrow">›</text>
       </view>
       <view v-if="!isInvite" class="menu-divider"></view>
+
+      <view class="menu-item" @tap="goPage('settings')">
+        <view class="menu-icon icon-purple">
+          <text class="icon-emoji">⚙️</text>
+        </view>
+        <view class="menu-content">
+          <view class="menu-title">筛选条件设置</view>
+          <view class="menu-desc">设置产品关键词、主机企业、零部件企业等</view>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <view class="menu-divider"></view>
       
       <!-- 推广菜单部分 （正式会员且填写了邀请人才展示） -->
       <view v-if="isOfficialMember && isInvite">
@@ -344,18 +370,6 @@
         </view>
       </view>
 
-      <view class="menu-divider"></view>
-
-      <view class="menu-item" @tap="goPage('settings')">
-        <view class="menu-icon icon-purple">
-          <text class="icon-emoji">⚙️</text>
-        </view>
-        <view class="menu-content">
-          <view class="menu-title">筛选条件设置</view>
-          <view class="menu-desc">设置产品关键词、主机企业、零部件企业等</view>
-        </view>
-        <text class="menu-arrow">›</text>
-      </view>
     </view>
 
     <!-- ========== 底部操作按钮 ========== -->
@@ -852,6 +866,7 @@ export default {
         customerList: '/pages-sub/mine/customer/index',
         paymentInfo: '/pages-sub/mine/payment/index',
         aiReport: '/pages-sub/mine/ai-report/index',
+        shareRecord: '/pages-sub/mine/share-record/index',
         settings: '/pages-sub/mine/settings/index'
       }
       if (routes[type]) {

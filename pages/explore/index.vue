@@ -107,7 +107,7 @@
     <block v-if="currentTab === 'company'">
       <view class="card-list" v-if="companyList.length > 0">
         <view class="comp-card" v-for="(item, index) in companyList" :key="index" @click="goCompany(item)">
-          <view class="comp-logo" :class="['logo-' + ((index % 3) + 1)]">
+          <view class="comp-logo">
             <text class="logo-text">{{ getCompChar(item.compName, index) }}</text>
           </view>
           <view class="comp-info">
@@ -690,24 +690,23 @@ export default {
   .comp-logo {
     width: 96rpx;
     height: 96rpx;
-    border-radius: 20rpx;
+    border-radius: 24rpx;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
-    background: #3c7df0;
-
-    image {
-      width: 100%;
-      height: 100%;
-    }
+    position: relative;
+    box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.25);
+    background: linear-gradient(135deg, #4183f4, #2563eb);
 
     .logo-text {
       font-size: 40rpx;
       font-weight: 700;
       color: #fff;
+      position: relative;
+      z-index: 1;
+      text-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.3);
     }
   }
 

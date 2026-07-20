@@ -263,7 +263,7 @@
 </template>
 
 <script>
-import { tankeLogin, searchCompany, tankeRegister, getMemberInfo, bindInvite, getInvite } from '@/static/api/index.js'
+import { tankeLogin, searchCompany, tankeRegister, getMemberInfo, bindInvite, getInvite, bindShare } from '@/static/api/index.js'
 import { getProductImageUrlChat } from '@/common/utils/index.js'
 import { showName } from '@/common/utils/index.js'
 
@@ -617,6 +617,16 @@ export default {
         uni.setStorageSync('memberInfo', res.data || {})
       } catch (e) {
         console.error('获取会员信息失败', e)
+      }
+      // 登录成功后检查是否有待绑定的分享关系
+      const pendingShareValue = uni.getStorageSync('pendingShareValue')
+      if (pendingShareValue) {
+        uni.removeStorageSync('pendingShareValue')
+        try {
+          await bindShare({ shareValue: pendingShareValue })
+        } catch (e) {
+          // 绑定失败静默处理
+        }
       }
     },
 

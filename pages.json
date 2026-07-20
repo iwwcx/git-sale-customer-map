@@ -170,6 +170,12 @@
 				"style": {
 					"navigationBarTitleText": "我的本地线索"
 				}
+			},
+			{
+				"path": "share-record/index",
+				"style": {
+					"navigationBarTitleText": "我的转发记录"
+				}
 			}
 		]
 	}, {

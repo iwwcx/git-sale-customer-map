@@ -27,9 +27,13 @@ export default {
     }
   },
   onLoad(options) {
-    // 检查是否有分享参数，有的话绑定分享关系
+    // 检查是否有分享参数，有的话先存到 storage，等登录后再绑定
     if (options && options.shareValue) {
-      this.bindShareRelation(options.shareValue)
+      uni.setStorageSync('pendingShareValue', options.shareValue)
+      // 如果已登录，直接绑定
+      if (uni.getStorageSync('token')) {
+        this.bindShareRelation(options.shareValue)
+      }
     }
     this.startCountdown()
   },

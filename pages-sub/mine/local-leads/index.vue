@@ -42,7 +42,7 @@
               <text class="hero-sparkle">🎯</text>
               <text class="hero-title hero-title-gradient">我的线索</text>
             </view>
-            <text class="hero-desc">根据您的<text style="color: red;"> 所在位置 </text> 和 <text style="color: red;">产品关键词</text>，匹配<text style="color: red;"> 近三天 </text>的精准需求<text style="color: #ad6a07;">（如何设置产品关键词，请与您的服务商或推荐官联系）</text></text>
+            <text class="hero-desc">根据您的<text style="color: red;"> 所在位置 </text> 和 <text style="color: red;">产品关键词</text>，匹配<text style="color: red;"> 近三天 </text>的精准需求<text style="color: #ff9900;">（如何设置产品关键词，请与您的服务商或推荐官联系）</text></text>
           </view>
           <view class="hero-orb">
             <view class="orb-ring orb-ring-1"></view>
@@ -154,7 +154,10 @@
                   <image class="lc-user-avatar" :src="item.userLogo && !item._logoErr ? getProductImageUrlChat(item.userLogo) : (item.sex == 2 ? 'https://img2cdn.global-dsc.cn/dgzz_img/6842d00b7f7db24082ed4f59f2bba02a.png' : 'https://img2cdn.global-dsc.cn/dgzz_img/8520f53eeff21f5a388f30b67e54e287.png')" mode="aspectFill" @error="item._logoErr = true" />
                   <view class="lc-user-text">
                     <text class="lc-user-name">{{ showName(item) }}</text>
-                    <text class="lc-user-company" v-if="item.compName">{{ item.compName }}</text>
+                    <view class="company-chip" v-if="item.compName">
+                      <view class="company-chip-icon">企</view>
+                      <text class="company-chip-name">{{ item.compName }}</text>
+                    </view>
                     <view class="lc-meta" v-if="item._distance || item.CProvince">
                       <text class="lc-meta-loc" v-if="item.CProvince">📍{{ [item.CProvince, item.CCity, item.CDistrict].filter(Boolean).join(' ') }}</text>
                       <text class="lc-meta-dist" v-if="item._distance">⛹ 距您 {{ item._distance }}</text>
@@ -224,7 +227,10 @@
                 <image class="lc-user-avatar" :src="item.userLogo && !item._logoErr ? getProductImageUrlChat(item.userLogo) : (item.sex == 2 ? 'https://img2cdn.global-dsc.cn/dgzz_img/6842d00b7f7db24082ed4f59f2bba02a.png' : 'https://img2cdn.global-dsc.cn/dgzz_img/8520f53eeff21f5a388f30b67e54e287.png')" mode="aspectFill" @error="item._logoErr = true" />
                 <view class="lc-user-text">
                   <text class="lc-user-name">{{ showName(item) }}</text>
-                  <text class="lc-user-company" v-if="item.compName">{{ item.compName }}</text>
+                  <view class="company-chip" v-if="item.compName">
+                    <view class="company-chip-icon">企</view>
+                    <text class="company-chip-name">{{ item.compName }}</text>
+                  </view>
                   <view class="lc-meta" v-if="item._distance || item.CProvince">
                     <text class="lc-meta-loc" v-if="item.CProvince">📍{{ [item.CProvince, item.CCity, item.CDistrict].filter(Boolean).join(' ') }}</text>
                     <text class="lc-meta-dist" v-if="item._distance">⛹ 距您 {{ item._distance }}</text>
@@ -616,9 +622,11 @@ export default {
       }
       try {
         await saveClueView({ clueId: item.clueId })
+        // 将当前保存的数据插入到历史线索列表最前面
+        this.savedList.unshift({ ...item })
         this.showToast({ title: '已保存到历史线索', icon: 'success' })
       } catch (e) {
-        this.showToast({ title: '保存失败，请重试', icon: 'none' })
+        // this.showToast({ title: '保存失败，请重试', icon: 'none' })
       }
     },
 
@@ -759,6 +767,7 @@ page {
 .hero-row {
   display: flex;
   align-items: center;
+  gap: 20rpx;
   justify-content: space-between;
 }
 
@@ -767,6 +776,7 @@ page {
 }
 
 .hero-title-row {
+  margin-bottom: 10rpx;
   display: flex;
   align-items: center;
   gap: 12rpx;
@@ -1235,13 +1245,37 @@ page {
   white-space: nowrap;
 }
 
-.lc-user-company {
-  font-size: 24rpx;
-  color: #64686d;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-top: 6rpx;
+.company-chip {
+  width: fit-content;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  margin: 6rpx 0;
+  padding: 4rpx 12rpx 4rpx 6rpx;
+  background: #eef5ff;
+  border: 1rpx solid #b9d6ff;
+  border-radius: 999rpx;
+  .company-chip-icon {
+    width: 28rpx;
+    height: 28rpx;
+    line-height: 28rpx;
+    text-align: center;
+    flex-shrink: 0;
+    font-size: 18rpx;
+    font-weight: 700;
+    color: #fff;
+    border-radius: 50%;
+    background: #4a8cff;
+  }
+  .company-chip-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 24rpx;
+    color: #3f7edb;
+  }
 }
 
 .lc-meta {
