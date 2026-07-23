@@ -456,7 +456,7 @@ export default {
   computed: {
     // 维护开关
     showUnderMaintenance() {
-      const openTime = new Date('2026/07/08 16:30:00').getTime()
+      const openTime = new Date('2026/07/23 12:00:00').getTime()
       return Date.now() <= openTime
     }
   },

@@ -217,13 +217,23 @@
     <!-- ========== 数据概览 ========== -->
     <view class="stat-row">
       <view class="stat-item" @tap="goPage('interestedCompany')">
-        <view class="stat-num">{{ followEnterpriseTotal }}</view>
-        <view class="stat-label">收藏的公司</view>
+        <view class="stat-num-row">
+          <view class="stat-num">{{ followEnterpriseTotal }}</view>
+          <view class="stat-badge" v-if="followEnterpriseUnread > 0">
+            <text class="stat-badge-num">{{ followEnterpriseUnread > 99 ? '99+' : followEnterpriseUnread }}</text>
+          </view>
+        </view>
+        <view class="stat-label">订阅的公司</view>
       </view>
       <view class="stat-divider"></view>
       <view class="stat-item" @tap="goPage('interestedEngineer')">
-        <view class="stat-num">{{ followUserTotal }}</view>
-        <view class="stat-label">收藏的工程师</view>
+        <view class="stat-num-row">
+          <view class="stat-num">{{ followUserTotal }}</view>
+          <view class="stat-badge" v-if="followUserUnread > 0">
+            <text class="stat-badge-num">{{ followUserUnread > 99 ? '99+' : followUserUnread }}</text>
+          </view>
+        </view>
+        <view class="stat-label">订阅的工程师</view>
       </view>
       <view class="stat-divider"></view>
       <view class="stat-item" @tap="goPage('contactedEngineer')">
@@ -251,26 +261,30 @@
 
       <view class="menu-divider"></view>
 
-      <view class="menu-item" @tap="goPage('aiReport')">
-        <view class="menu-icon icon-cyan">
-          <text class="icon-emoji">📊</text>
+      <view class="menu-item" @tap="goPage('shareRecord')">
+        <view class="menu-icon icon-purple" style="background: linear-gradient(135deg, #eaf7b5, #d2df67);">
+          <text class="icon-emoji">📬</text>
         </view>
         <view class="menu-content">
-          <view class="menu-title">我的AI报告</view>
-          <view class="menu-desc">查看已生成的AI分析报告记录</view>
+          <view class="menu-title">我的转发记录</view>
+          <view class="menu-desc">查看你的分享链路与二次转发</view>
         </view>
         <text class="menu-arrow">›</text>
       </view>
 
       <view class="menu-divider"></view>
 
-      <view class="menu-item" @tap="goPage('shareRecord')">
-        <view class="menu-icon icon-purple">
-          <text class="icon-emoji">🔗</text>
+      <view class="menu-item" @tap="goPage('aiReport')">
+        <view class="menu-icon icon-cyan">
+          <text class="icon-emoji">📊</text>
         </view>
-        <view class="menu-content">
-          <view class="menu-title">我的转发记录</view>
-          <view class="menu-desc">查看你的分享链路与二次转发</view>
+        <view class="menu-content" v-if="showContent">
+          <view class="menu-title">我的AI报告</view>
+          <view class="menu-desc">查看已生成的AI分析报告记录</view>
+        </view>
+        <view class="menu-content" v-else>
+          <view class="menu-title">我的报告</view>
+          <view class="menu-desc">查看已生成的分析报告记录</view>
         </view>
         <text class="menu-arrow">›</text>
       </view>
@@ -288,7 +302,7 @@
         </view>
         <text class="menu-arrow">›</text>
       </view>
-      <view v-if="!isInvite" class="menu-divider"></view>
+      <view v-if="!isInvite && !isOfficialMember" class="menu-divider"></view>
 
       <view class="menu-item" @tap="goPage('settings')">
         <view class="menu-icon icon-purple">
@@ -301,11 +315,10 @@
         <text class="menu-arrow">›</text>
       </view>
 
-      <view class="menu-divider"></view>
-      
       <!-- 推广菜单部分 （正式会员且填写了邀请人才展示） -->
-      <view v-if="isOfficialMember && isInvite">
-        <view v-if="isMember" class="menu-item" @tap="goPage('customerList')">
+      <view v-if="isOfficialMember && isInvite && isMember">
+        <view class="menu-divider"></view>
+        <view class="menu-item" @tap="goPage('customerList')">
           <view class="menu-icon icon-blue">
             <text class="icon-emoji">🧑‍💻</text>
           </view>
@@ -316,9 +329,9 @@
           <text class="menu-arrow">›</text>
         </view>
 
-        <view v-if="isMember" class="menu-divider"></view>
+        <view class="menu-divider"></view>
 
-        <view v-if="isMember" class="menu-item" @tap="goPage('paymentInfo')">
+        <view class="menu-item" @tap="goPage('paymentInfo')">
           <view class="menu-icon icon-orange">
             <text class="icon-emoji">✍</text>
           </view>
@@ -330,45 +343,6 @@
         </view>
       </view>
 
-      <!-- 我收藏的工程师，公司，最近联系人等 -->
-      <view v-else>
-        <view class="menu-item" @tap="goPage('interestedCompany')">
-          <view class="menu-icon icon-blue">
-            <text class="icon-emoji">⛺</text>
-          </view>
-          <view class="menu-content">
-            <view class="menu-title">我收藏的公司</view>
-            <view class="menu-desc">查看我收藏的所有公司</view>
-          </view>
-          <text class="menu-arrow">›</text>
-        </view>
-
-        <view class="menu-divider"></view>
-
-        <view class="menu-item" @tap="goPage('interestedEngineer')">
-          <view class="menu-icon icon-cyan">
-            <text class="icon-emoji" style="position: relative; top: -6rpx;">🧑‍💻</text>
-          </view>
-          <view class="menu-content">
-            <view class="menu-title">我收藏的工程师</view>
-            <view class="menu-desc">查看我收藏的所有工程师</view>
-          </view>
-          <text class="menu-arrow">›</text>
-        </view>
-
-        <view class="menu-divider"></view>
-
-        <view class="menu-item" @tap="goPage('contactedEngineer')">
-          <view class="menu-icon icon-orange">
-            <text class="icon-emoji">✍</text>
-          </view>
-          <view class="menu-content">
-            <view class="menu-title">我联系过的工程师</view>
-            <view class="menu-desc">查看历史联系记录</view>
-          </view>
-          <text class="menu-arrow">›</text>
-        </view>
-      </view>
 
     </view>
 
@@ -499,7 +473,7 @@
 </template>
 
 <script>
-import { getUserMyInfo, followEnterpriseList, followUserList, getChatList, getInvite, getMyPromoterInfo, getInviterPromoterPayInfo, getUserConfig, getLocalLeadsUnreadCount } from '@/static/api/index.js'
+import { getUserMyInfo, followEnterpriseList, followEnterpriseClues, followUserList, followUserClues, getChatList, getInvite, getMyPromoterInfo, getInviterPromoterPayInfo, getUserConfig } from '@/static/api/index.js'
 import { showName, getProductImageUrl, getProductImageUrlChat } from '@/common/utils/index.js'
 
 export default {
@@ -525,8 +499,17 @@ export default {
       memberTipVisible: false, // 是否显示会员权益说明弹窗
       inviterPayInfo: null, // 邀请人收款信息
       expireTime: '', // 会员到期时间，正式会员续费弹窗需要展示
-      localLeadsUnread: 0 // 本地线索未读数量（角标显示用）
+      localLeadsUnread: 0, // 本地线索未读数量（角标显示用）
+      followEnterpriseUnread: 0, // 订阅企业线索总未读数（角标显示用）
+      followUserUnread: 0 // 订阅用户线索总未读数（角标显示用）
     }
+  },
+  computed: {
+    // ----------- 
+    showContent() {
+      const openTime = new Date('2026/07/23 12:00:00').getTime()
+      return Date.now() >= openTime
+    },
   },
   onLoad() {
     // 预留 onLoad 初始化逻辑
@@ -545,13 +528,14 @@ export default {
     this.currentUserID = storedUserInfo.UserID || ''
     this.getUserMyInfo()
     this.getFollowEnterpriseList()
+    this.getFollowEnterpriseClues()
     this.getFollowUserList()
+    this.getFollowUserClues()
     this.getChatList()
     this.fetchInviteStatus()
     this.fetchUserConfig()
     this.fetchPromoterStatus()
     this.getInviterPromoterPayInfo()
-    this.fetchLocalLeadsUnread()
   },
   methods: {
     // ----------- 跳转推广者申请页
@@ -761,10 +745,34 @@ export default {
       this.followEnterpriseTotal = res.data.total
     },
 
+    // ----------- 获取订阅企业线索未读数
+    async getFollowEnterpriseClues() {
+      try {
+        const res = await followEnterpriseClues()
+        if (res && res.data) {
+          this.followEnterpriseUnread = res.data.totalUnread || 0
+        }
+      } catch (e) {
+        // 接口异常静默处理
+      }
+    },
+
     // ----------- 获取关注用户列表
     async getFollowUserList() {
       const res = await followUserList()
       this.followUserTotal = res.data.total
+    },
+
+    // ----------- 获取订阅用户线索未读数
+    async getFollowUserClues() {
+      try {
+        const res = await followUserClues()
+        if (res && res.data) {
+          this.followUserUnread = res.data.totalUnread || 0
+        }
+      } catch (e) {
+        // 接口异常静默处理
+      }
     },
 
     // ----------- 获取最近联系人
@@ -840,18 +848,6 @@ export default {
     // ----------- 跳转到支付页开通VIP
     goOpenVip() {
       uni.navigateTo({ url: '/pages/common/pay/pay' })
-    },
-
-    // ----------- 获取本地线索未读数量（角标用）
-    async fetchLocalLeadsUnread() {
-      try {
-        const res = await getLocalLeadsUnreadCount()
-        if (res && res.data) {
-          this.localLeadsUnread = res.data.unreadCount || 0
-        }
-      } catch (e) {
-        // 接口异常静默处理
-      }
     },
 
     // ----------- 跳转到指定的功能页
@@ -1317,11 +1313,35 @@ export default {
     align-items: center;
     gap: 8rpx;
 
+    .stat-num-row {
+      position: relative;
+      display: inline-flex;
+      align-items: baseline;
+    }
+
     .stat-num {
       font-size: 40rpx;
       font-weight: 700;
       color: #2962ff;
       line-height: 1;
+    }
+
+    .stat-badge {
+      position: absolute;
+      top: -26rpx;
+      right: -42rpx;
+      padding: 6rpx 12rpx;
+      border-radius: 999rpx;
+      background: #ff3b3b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .stat-badge-num {
+        font-size: 20rpx;
+        color: #fff;
+        line-height: 1;
+      }
     }
 
     .stat-label {
@@ -1411,6 +1431,17 @@ export default {
         font-weight: 500;
         line-height: 1.3;
         margin-bottom: 6rpx;
+
+        .reward-tag {
+          display: inline-block;
+          margin-left: 12rpx;
+          font-size: 24rpx;
+          font-weight: 600;
+          line-height: 1;
+          letter-spacing: 1rpx;
+          color: #f05a28;
+          vertical-align: middle;
+        }
       }
 
       .menu-desc {

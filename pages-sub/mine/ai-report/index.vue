@@ -172,7 +172,7 @@ export default {
   computed: {
     // ----------- 
     showContent() {
-      const openTime = new Date('2026/07/08 16:30:00').getTime()
+      const openTime = new Date('2026/07/23 12:00:00').getTime()
       return Date.now() >= openTime
     },
     // ----------- 覆盖企业总数

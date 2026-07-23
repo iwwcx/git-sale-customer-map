@@ -12,7 +12,7 @@
           <view class="tab-item" :class="{ active: currentTab === 'product' }" @tap="changeTab('product')">搜产品需求</view>
           <view class="tab-item" :class="{ active: currentTab === 'company' }" @tap="changeTab('company')">搜企业</view>
           <view class="tab-item" :class="{ active: currentTab === 'engineer' }" @tap="changeTab('engineer')">搜工程师</view>
-          <view class="tab-item ai" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
+          <view v-if="showContent" class="tab-item ai" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
         </view>
       </template>
     </search-product>
@@ -24,7 +24,7 @@
           <view class="tab-item" :class="{ active: currentTab === 'product' }" @tap="changeTab('product')">搜产品需求</view>
           <view class="tab-item" :class="{ active: currentTab === 'company' }" @tap="changeTab('company')">搜企业</view>
           <view class="tab-item" :class="{ active: currentTab === 'engineer' }" @tap="changeTab('engineer')">搜工程师</view>
-          <view class="tab-item ai" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
+          <view v-if="showContent" class="tab-item ai" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
         </view>
       </template>
     </search-company>
@@ -36,7 +36,7 @@
           <view class="tab-item" :class="{ active: currentTab === 'product' }" @tap="changeTab('product')">搜产品需求</view>
           <view class="tab-item" :class="{ active: currentTab === 'company' }" @tap="changeTab('company')">搜企业</view>
           <view class="tab-item" :class="{ active: currentTab === 'engineer' }" @tap="changeTab('engineer')">搜工程师</view>
-          <view class="tab-item ai" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
+          <view v-if="showContent" class="tab-item ai" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
         </view>
       </template>
     </search-engineer>
@@ -48,7 +48,7 @@
           <view class="tab-item" :class="{ active: currentTab === 'product' }" @tap="changeTab('product')">搜产品需求</view>
           <view class="tab-item" :class="{ active: currentTab === 'company' }" @tap="changeTab('company')">搜企业</view>
           <view class="tab-item" :class="{ active: currentTab === 'engineer' }" @tap="changeTab('engineer')">搜工程师</view>
-          <view class="tab-item ai" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
+          <view v-if="showContent" class="tab-item ai" :class="{ active: currentTab === 'ai' }" @tap="changeTab('ai')">AI助手</view>
         </view>
       </template>
     </search-ai-assistant>
@@ -71,6 +71,13 @@ export default {
       currentTab: 'product', // 当前激活的子 tab：product / company / engineer / ai
       showMemberBanner: mixinShowMemberBanner() // 是否展示非会员/试用横幅
     }
+  },
+  computed: {
+    // ----------- 
+    showContent() {
+      const openTime = new Date('2026/07/23 12:00:00').getTime()
+      return Date.now() >= openTime
+    },
   },
   onShow() {
     this.showMemberBanner = mixinShowMemberBanner()

@@ -39,10 +39,14 @@
         <view class="hero-row">
           <view class="hero-info">
             <view class="hero-title-row">
+              <text class="hero-title hero-title-gradient">我的本地线索</text>
               <text class="hero-sparkle">🎯</text>
-              <text class="hero-title hero-title-gradient">我的线索</text>
             </view>
-            <text class="hero-desc">根据您的<text style="color: red;"> 所在位置 </text> 和 <text style="color: red;">产品关键词</text>，匹配<text style="color: red;"> 近三天 </text>的精准需求<text style="color: #ff9900;">（如何设置产品关键词，请与您的服务商或推荐官联系）</text></text>
+            <view class="hero-desc">根据您的<text class="hl hl-orange">所在位置</text>和<text class="hl hl-orange">产品关键词</text>，为您匹配<text class="hl hl-orange">近三天</text>的精准需求</view>
+            <!-- 设置提示条 -->
+            <!-- <view class="hero-tip">
+              <text class="hero-tip-text">如何设置产品关键词？请与您的服务商或推荐官联系</text>
+            </view> -->
           </view>
           <view class="hero-orb">
             <view class="orb-ring orb-ring-1"></view>
@@ -94,8 +98,62 @@
     <scroll-view class="page-scroll" scroll-y refresher-enabled :refresher-triggered="refreshing" @refresherrefresh="onRefresh" @scrolltolower="onLoadMore" lower-threshold="100">
       <!-- ========== 获取线索 Tab ========== -->
       <template v-if="activeTab === 'fetch'">
+        <!-- 未上传产品缺省提醒页 -->
+        <view v-if="needUploadProduct" class="product-empty">
+          <!-- 插画区 -->
+          <view class="pe-visual">
+            <view class="pe-visual-glow"></view>
+            <view class="pe-visual-ring"></view>
+            <view class="pe-visual-card">
+              <view class="pe-vc-line pe-vc-line-1"></view>
+              <view class="pe-vc-line pe-vc-line-2"></view>
+              <view class="pe-vc-line pe-vc-line-3"></view>
+              <view class="pe-vc-tag">📦 产品</view>
+            </view>
+            <view class="pe-visual-plus">+</view>
+          </view>
+
+          <!-- 标题 -->
+          <text class="pe-title">尚未上传产品</text>
+          <text class="pe-subtitle">完善产品信息后，即可开启精准线索推送</text>
+
+          <!-- 说明卡片 -->
+          <view class="pe-desc-card">
+            <view class="pe-desc-head">
+              <view class="pe-desc-icon"><text>💡</text></view>
+              <text class="pe-desc-title">功能说明</text>
+            </view>
+            <view class="pe-desc-body">
+              <view class="pe-desc-step">
+                <view class="pe-step-dot">1</view>
+                <text class="pe-step-text">将自己的<text class="pe-hl">产品</text>正确上传到平台</text>
+              </view>
+              <view class="pe-desc-step">
+                <view class="pe-step-dot">2</view>
+                <text class="pe-step-text">设置<text class="pe-hl">产品关键词</text>匹配规则</text>
+              </view>
+              <view class="pe-desc-step">
+                <view class="pe-step-dot">3</view>
+                <text class="pe-step-text">系统持续为您推送<text class="pe-hl-blue">精准时效客户线索</text></text>
+              </view>
+            </view>
+            <text class="pe-desc-tip">具体操作，请联系您身边的服务商或在线客服</text>
+          </view>
+
+          <!-- 联系电话按钮 -->
+          <view class="pe-contact-btn" @tap="onCallService">
+            <view class="pe-contact-btn-glow"></view>
+            <view class="pe-contact-btn-icon"><text>📞</text></view>
+            <view class="pe-contact-btn-text">
+              <text class="pe-contact-btn-label">{{ hasPromoter ? '联系您的服务商' : '联系在线客服' }}</text>
+              <text class="pe-contact-btn-phone">{{ hasPromoter ? promoterPhone : servicePhone }}</text>
+            </view>
+            <view class="pe-contact-btn-arrow"><text>›</text></view>
+          </view>
+        </view>
+
         <!-- 接收线索按钮区 -->
-        <view class="action-zone" v-if="!hasSearched">
+        <view class="action-zone" v-if="!needUploadProduct && !hasSearched">
           <view class="receive-card">
             <view class="receive-card-glow"></view>
             <view class="receive-icon-wrap">
@@ -325,7 +383,7 @@
 
 <script>
 import EmptyState from '@/common/components/empty-state.vue'
-import { searchUsersByAdvert, clueViewList, saveClueView, deleteClueView } from '@/static/api/index.js'
+import { searchUsersByAdvert, clueViewList, saveClueView, deleteClueView, checkEnterpriseStatus, getInvite, getInviterPromoterPayInfo } from '@/static/api/index.js'
 import { getProductImageUrlChat } from '@/common/utils/index.js'
 import { showName } from '@/common/utils/index.js'
 
@@ -364,7 +422,12 @@ export default {
       detailData: null, // 详情弹窗数据
       animStats: { total: 0, download: 0, browse: 0 }, // 顶部统计数字（动画补间显示用）
       _tweenTimers: {}, // 内部计时器存储
-      defaultAvatar: 'https://img2cdn.global-dsc.cn/dgzz_img/8520f53eeff21f5a388f30b67e54e287.png'
+      defaultAvatar: 'https://img2cdn.global-dsc.cn/dgzz_img/8520f53eeff21f5a388f30b67e54e287.png',
+      statusChecked: false, // 企业状态是否已校验完成
+      needUploadProduct: false, // 是否未上传产品（hasKeywords1 为 false），需展示缺省提醒页
+      hasPromoter: false, // 是否有推荐官
+      promoterPhone: '', // 推荐官电话（服务商电话）
+      servicePhone: '19819976695' // 在线客服电话（无推荐官时使用）
     }
   },
   computed: {
@@ -389,11 +452,63 @@ export default {
     }
   },
   onLoad() {
-    // 页面加载时先获取已有线索列表
-    this.fetchExistingLeads()
+    // 页面加载时先校验企业状态（是否上传产品），再决定是否加载线索
+    this.checkStatus()
   },
   methods: {
     getProductImageUrlChat,
+
+    // ----------- 校验企业状态：hasKeywords1 为 false 表示未上传产品，展示缺省提醒页
+    async checkStatus() {
+      try {
+        const res = await checkEnterpriseStatus()
+        const data = res?.data || res || {}
+        // 未上传产品（无关键词）
+        this.needUploadProduct = !data.hasKeywords1
+      } catch (e) {
+        // 接口异常时默认放行，避免误拦截
+        this.needUploadProduct = false
+      } finally {
+        this.statusChecked = true
+        if (this.needUploadProduct) {
+          // 需要展示缺省提醒页时获取推荐官电话
+          this.fetchPromoterPhone()
+        } else {
+          // 正常流程：获取已有线索列表
+          this.fetchExistingLeads()
+        }
+      }
+    },
+
+    // ----------- 获取推荐官电话：有推荐官取其电话作为服务商电话，无则用在线客服电话
+    async fetchPromoterPhone() {
+      try {
+        const inviteRes = await getInvite()
+        this.hasPromoter = !!inviteRes?.data?.isInvite
+        if (this.hasPromoter) {
+          const payRes = await getInviterPromoterPayInfo()
+          this.promoterPhone = payRes?.data?.phone || ''
+          // 推荐官未填写电话时回退到在线客服
+          if (!this.promoterPhone) this.hasPromoter = false
+        }
+      } catch (e) {
+        // 接口异常时按无推荐官处理，展示在线客服电话
+        this.hasPromoter = false
+      }
+    },
+
+    // ----------- 拨打提醒页电话（服务商电话或在线客服电话）
+    onCallService() {
+      const phone = this.hasPromoter ? this.promoterPhone : this.servicePhone
+      uni.makePhoneCall({
+        phoneNumber: String(phone),
+        fail: (err) => {
+          if (err && err.errMsg && err.errMsg.indexOf('cancel') === -1) {
+            this.showToast({ title: '拨打失败', icon: 'none' })
+          }
+        }
+      })
+    },
 
     // ----------- 显示自定义 toast（替代 uni.showToast）
     showToast({ title, icon = 'none', duration = 2000 }) {
@@ -486,7 +601,7 @@ export default {
           this.showToast({ title: '近三天暂无匹配线索', icon: 'none' })
         }
       } catch (e) {
-        this.showToast({ title: e, icon: 'none' })
+        // this.showToast({ title: e, icon: 'none' })
       } finally {
         this.searching = false
       }
@@ -524,7 +639,7 @@ export default {
         this.list = this.list.concat(items)
       } catch (e) {
         this.page--
-        this.showToast({ title: '加载失败，请重试', icon: 'none' })
+        // this.showToast({ title: '加载失败，请重试', icon: 'none' })
       } finally {
         this.loadingMore = false
       }
@@ -547,7 +662,7 @@ export default {
         this.savedList = this.savedList.concat(items)
       } catch (e) {
         this.historyPage--
-        this.showToast({ title: '加载失败，请重试', icon: 'none' })
+        // this.showToast({ title: '加载失败，请重试', icon: 'none' })
       } finally {
         this.historyLoadingMore = false
       }
@@ -791,7 +906,7 @@ page {
 }
 
 .hero-title-gradient {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+  background: #8950f0;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -804,11 +919,57 @@ page {
 }
 
 .hero-desc {
-  margin-top: 12rpx;
+  margin-top: 14rpx;
+  margin-right: 40rpx;
   font-size: 25rpx;
   color: #64748b;
-  line-height: 1.45;
+  line-height: 1.7; // 行高调大，避免高亮胶囊上下贴太紧
+}
+
+// 关键词高亮胶囊
+.hl {
+  padding: 2rpx 6rpx;
+  margin: 0 2rpx;
+  border-radius: 8rpx;
+  font-weight: 600;
+  font-size: 24rpx;
+}
+
+.hl-blue {
+  color: #4f46e5;
+  background: rgba(79, 70, 229, 0.1);
+}
+
+.hl-purple {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.hl-orange {
+  color: #ef2308;
+}
+
+// 设置提示条
+.hero-tip {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 16rpx;
   margin-right: 40rpx;
+}
+
+.hero-tip-ico {
+  flex-shrink: 0;
+  font-size: 22rpx;
+  line-height: 1.4;
+}
+
+.hero-tip-text {
+  width: 120%;
+  flex: 1;
+  font-size: 22rpx;
+  color: #6b6767;
+  line-height: 1.4;
 }
 
 // Hero Orb - 深蓝金色系
@@ -852,7 +1013,7 @@ page {
 .stat-row {
   display: flex;
   gap: 14rpx;
-  margin-top: 36rpx;
+  margin-top: 28rpx;
 }
 
 .stat-tile {
@@ -1994,5 +2155,345 @@ page {
 
 .confirm-btn-delete {
   background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+// ==================== 未上传产品缺省提醒页
+.product-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30rpx 48rpx 100rpx;
+}
+
+// -------- 插画区：模拟一个"待添加产品"的卡片
+.pe-visual {
+  position: relative;
+  width: 320rpx;
+  height: 300rpx;
+  margin-bottom: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: peRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+// 背景光晕
+.pe-visual-glow {
+  position: absolute;
+  width: 280rpx;
+  height: 280rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(99, 102, 241, 0) 65%);
+  animation: peBreath 5s ease-in-out infinite;
+}
+
+// 装饰圆环
+.pe-visual-ring {
+  position: absolute;
+  width: 260rpx;
+  height: 260rpx;
+  border-radius: 50%;
+  border: 2rpx solid rgba(99, 102, 241, 0.12);
+  animation: peRingPulse 4s ease-in-out infinite;
+}
+
+// 产品卡片
+.pe-visual-card {
+  position: relative;
+  width: 200rpx;
+  height: 240rpx;
+  border-radius: 28rpx;
+  background: linear-gradient(160deg, #ffffff 0%, #f0f4ff 100%);
+  box-shadow: 0 20rpx 48rpx rgba(99, 102, 241, 0.15), 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+  padding: 28rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  animation: peCardFloat 5s ease-in-out infinite;
+}
+
+// 卡片内的骨架线条（模拟产品信息占位）
+.pe-vc-line {
+  height: 16rpx;
+  border-radius: 8rpx;
+  background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: peSkeleton 2s ease-in-out infinite;
+}
+
+.pe-vc-line-1 {
+  width: 60%;
+}
+
+.pe-vc-line-2 {
+  width: 100%;
+  animation-delay: 0.3s;
+}
+
+.pe-vc-line-3 {
+  width: 75%;
+  animation-delay: 0.6s;
+}
+
+// 卡片上的产品标签
+.pe-vc-tag {
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  font-size: 20rpx;
+  color: #fff;
+  font-weight: 600;
+}
+
+// 右下角加号
+.pe-visual-plus {
+  position: absolute;
+  right: 20rpx;
+  bottom: 10rpx;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  box-shadow: 0 10rpx 24rpx rgba(99, 102, 241, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: #fff;
+  font-weight: 300;
+  animation: pePlusPop 3s ease-in-out infinite;
+}
+
+// -------- 标题
+.pe-title {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: 1rpx;
+  animation: peRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+.pe-subtitle {
+  margin-top: 16rpx;
+  margin-bottom: 48rpx;
+  font-size: 26rpx;
+  color: #94a3b8;
+  text-align: center;
+  animation: peRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
+}
+
+// -------- 说明卡片
+.pe-desc-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 28rpx;
+  padding: 36rpx 10rpx 32rpx 36rpx;
+  box-shadow: 0 8rpx 32rpx rgba(15, 23, 42, 0.06);
+  margin-bottom: 32rpx;
+  animation: peRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
+}
+
+.pe-desc-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 28rpx;
+}
+
+.pe-desc-icon {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 16rpx;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+}
+
+.pe-desc-title {
+  margin-left: 16rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.pe-desc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  padding-left: 4rpx;
+}
+
+.pe-desc-step {
+  display: flex;
+  align-items: flex-start;
+}
+
+.pe-step-dot {
+  flex-shrink: 0;
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4rpx;
+  margin-right: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(99, 102, 241, 0.3);
+}
+
+.pe-step-text {
+  font-size: 27rpx;
+  color: #475569;
+  line-height: 1.6;
+  flex: 1;
+}
+
+.pe-desc-tip {
+  margin-top: 40rpx;
+  padding-top: 24rpx;
+  font-size: 25rpx;
+  color: #94a3b8;
+  line-height: 1.5;
+  position: relative;
+  top: 6rpx;
+}
+
+.pe-hl {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.pe-hl-blue {
+  color: #4f46e5;
+  font-weight: 700;
+}
+
+// -------- 联系电话按钮
+.pe-contact-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 28rpx 20rpx;
+  border-radius: 28rpx;
+  background: #fff;
+  box-shadow: 0 8rpx 32rpx rgba(15, 23, 42, 0.06);
+  transition: transform 0.15s ease;
+  animation: peRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.pe-contact-btn-glow {
+  display: none;
+}
+
+.pe-contact-btn-icon {
+  flex-shrink: 0;
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 20rpx;
+  background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+}
+
+.pe-contact-btn-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 20rpx;
+}
+
+.pe-contact-btn-label {
+  font-size: 24rpx;
+  color: #94a3b8;
+  margin-bottom: 4rpx;
+}
+
+.pe-contact-btn-phone {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #4f46e5;
+  letter-spacing: 1rpx;
+}
+
+.pe-contact-btn-arrow {
+  flex-shrink: 0;
+  font-size: 44rpx;
+  color: #cbd5e1;
+  line-height: 1;
+}
+
+// -------- 动效
+@keyframes peRise {
+  from {
+    opacity: 0;
+    transform: translateY(30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes peBreath {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes peRingPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.8;
+  }
+}
+
+@keyframes peCardFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-16rpx) rotate(-1.5deg);
+  }
+}
+
+@keyframes peSkeleton {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes pePlusPop {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
 }
 </style>

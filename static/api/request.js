@@ -76,7 +76,8 @@ const createRequest = (apiKey = 'api60') => {
       params,
       headers = {},
       skipCodeCheck = false,
-      skipErrorToast = false // 静默处理错误，不弹 toast（如 getMemberInfo 后台调用）
+      skipErrorToast = false, // 静默处理错误，不弹 toast（如 getMemberInfo 后台调用）
+      tokenType = '' // 自定义请求头 tokenType，部分接口需要传 'jrzz'
     } = options;
 
     // 构建 URL
@@ -108,6 +109,11 @@ const createRequest = (apiKey = 'api60') => {
     // 添加 token
     if (token) {
       config.header['Authorization'] = `Bearer ${token}`;
+    }
+
+    // 添加自定义 tokenType 请求头
+    if (tokenType) {
+      config.header['tokenType'] = tokenType;
     }
 
     return new Promise((resolve, reject) => {
@@ -207,7 +213,8 @@ const request = (options) => {
     apiKey = 'api60',
     headers = {},
     skipCodeCheck = false,
-    skipErrorToast = false
+    skipErrorToast = false,
+    tokenType = ''
   } = options;
 
   const requestFunc = createRequest(apiKey);
@@ -219,7 +226,8 @@ const request = (options) => {
     params,
     headers,
     skipCodeCheck,
-    skipErrorToast
+    skipErrorToast,
+    tokenType
   });
 };
 

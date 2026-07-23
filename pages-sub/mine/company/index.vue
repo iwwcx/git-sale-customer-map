@@ -5,13 +5,13 @@
       <view class="list-head">
         <view class="lh-bar"></view>
         <text class="lh-title">企业列表</text>
-        <text class="lh-count" v-if="list.length">共 {{ list.length }} 家</text>
+        <text class="lh-count">共 {{ list.length }} 家</text>
         <view class="lh-actions">
-          <view class="lh-action-btn" @tap="showAddDirPopup">
-            <text class="lh-action-icon">➕</text>
-          </view>
           <view class="lh-action-btn lh-action-del" @tap="showDeleteDirSheet" v-if="dirList.length">
-            <text class="lh-action-icon">➖</text>
+            <text class="lh-action-text">删除目录</text>
+          </view>
+          <view class="lh-action-btn lh-action-add" @tap="showAddDirPopup">
+            <text class="lh-action-text" style="color: #435ffc;">新增目录</text>
           </view>
         </view>
       </view>
@@ -68,6 +68,7 @@
             <view class="cc-icon-wrap" :class="`cc-icon-${index % 4}`">
               <text class="cc-icon-txt">🏢</text>
             </view>
+            <view class="cc-unread-badge" v-if="item.clueUnread > 0">{{ item.clueUnread > 99 ? '99+' : item.clueUnread }}</view>
             <text class="cc-title">{{ item.companyName || '未知公司' }}</text>
           </view>
 
@@ -85,7 +86,7 @@
 
           <!-- 底部：查看详情按钮 -->
           <view class="cc-foot">
-            <text class="cc-time" v-if="item.distance">⛹ 距您 {{ (parseInt(item.distance) / 1000).toFixed(2) }}km</text>
+            <text class="cc-time">⛹ 距您 {{ item.distance ? (parseInt(item.distance) / 1000).toFixed(2) : '-' }}km</text>
             <view class="cc-foot-actions">
               <view class="cc-move-btn" @tap.stop="showMoveDirSheet(item)">
                 <text class="cc-move-btn-text">修改目录</text>
@@ -244,7 +245,7 @@
 
 <script>
 import EmptyState from '@/common/components/empty-state.vue'
-import { followEnterpriseList, addCompanyDir, getCompanyDirList, batchDeleteDir, deleteDirData, addDirData } from '@/static/api/index.js'
+import { followEnterpriseList, addCompanyDir, getCompanyDirList, batchDeleteDir, deleteDirData, addDirData, markFollowClueRead } from '@/static/api/index.js'
 
 export default {
   components: {
@@ -351,6 +352,8 @@ export default {
 
     // ----------- 点击卡片跳详情
     onCardTap(item) {
+      // 标记该企业线索已读
+      markFollowClueRead({ followType: 'enterprise', followTarget: item.companyName }).catch(() => {})
       const companyInfo = encodeURIComponent(JSON.stringify({
         ...item,
         compName: item.companyName,
@@ -562,7 +565,6 @@ page {
 
 .dir-tab-active {
   background: linear-gradient(135deg, #6366f1 0%, #818cf8 50%, #a855f7 100%);
-  box-shadow: 0 8rpx 24rpx rgba(99, 102, 241, 0.35);
   border-color: transparent;
 }
 
@@ -625,24 +627,20 @@ page {
 .lh-actions {
   display: flex;
   align-items: center;
-  gap: 20rpx;
+  gap: 16rpx;
 }
 
 .lh-action-btn {
-  width: 50rpx;
-  height: 50rpx;
-  border-radius: 50%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 4rpx 12rpx rgba(99, 102, 241, 0.4);
+  gap: 6rpx;
+  border-radius: 999rpx;
 }
 
 
-.lh-action-icon {
+.lh-action-text {
   font-size: 26rpx;
-  color: #ffffff;
-  font-weight: bold;
+  color: #ff0707;
   line-height: 1;
 }
 
@@ -655,12 +653,12 @@ page {
 .c-card {
   position: relative;
   overflow: hidden;
-  margin-bottom: 22rpx;
-  padding: 28rpx 30rpx 26rpx;
-  border-radius: 28rpx;
+  margin-bottom: 20rpx;
+  padding: 24rpx 28rpx 22rpx;
+  border-radius: 26rpx;
   background: #fff;
   border: 1rpx solid #eef0f6;
-  box-shadow: 0 10rpx 28rpx rgba(15, 23, 42, 0.05);
+  box-shadow: 0 8rpx 24rpx rgba(15, 23, 42, 0.09);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 
   &:active {
@@ -677,7 +675,7 @@ page {
   width: 220rpx;
   height: 220rpx;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(99, 102, 241, 0.06) 40%, transparent 70%);
+  background: radial-gradient(circle, rgb(209 190 227 / 15%) 0%, rgb(152 152 152 / 6%) 40%, #ffffff00 70%);
   pointer-events: none;
 }
 
@@ -691,16 +689,16 @@ page {
 
 .cc-icon-wrap {
   flex-shrink: 0;
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: 18rpx;
+  width: 58rpx;
+  height: 58rpx;
+  border-radius: 16rpx;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .cc-icon-txt {
-  font-size: 32rpx;
+  font-size: 30rpx;
 }
 
 .cc-icon-0 {
@@ -729,13 +727,30 @@ page {
   min-width: 0;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
   overflow: hidden;
   font-size: 32rpx;
   font-weight: 700;
   color: #0f172a;
-  line-height: 1.45;
+  line-height: 1.4;
+}
+
+// 未读角标（定位到图标右下角）
+.cc-unread-badge {
+  position: absolute;
+  left: 40rpx;
+  top: 36rpx;
+  padding: 6rpx 12rpx;
+  border-radius: 999rpx;
+  background: #ff3b3b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18rpx;
+  color: #fff;
+  line-height: 1;
+  z-index: 2;
 }
 
 // 标签芯片
@@ -744,7 +759,7 @@ page {
   display: flex;
   flex-wrap: wrap;
   gap: 12rpx;
-  margin-top: 22rpx;
+  margin-top: 16rpx;
 }
 
 .cc-chip {
@@ -752,8 +767,8 @@ page {
   align-items: center;
   gap: 8rpx;
   max-width: 100%;
-  padding: 10rpx 18rpx;
-  border-radius: 14rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
 }
 
 .chip-ico {
@@ -762,7 +777,6 @@ page {
 
 .chip-text {
   font-size: 24rpx;
-  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -785,8 +799,8 @@ page {
 // 底部：时间 + 按钮
 .cc-foot {
   position: relative;
-  margin-top: 24rpx;
-  padding-top: 22rpx;
+  margin-top: 18rpx;
+  padding-top: 18rpx;
   border-top: 1rpx dashed #eef0f6;
   display: flex;
   align-items: center;
@@ -802,7 +816,7 @@ page {
 .cc-move-btn {
   display: flex;
   align-items: center;
-  padding: 12rpx 26rpx;
+  padding: 10rpx 24rpx;
   border-radius: 999rpx;
   background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
   border: 1rpx solid rgba(59, 130, 246, 0.15);
@@ -818,11 +832,11 @@ page {
 .cc-time {
   display: inline-flex;
   align-items: center;
-  padding: 6rpx 18rpx;
+  padding: 6rpx 16rpx;
   border-radius: 999rpx;
   font-size: 24rpx;
   color: #ff8d00;
-  background: linear-gradient(135deg, #eef2ff, #ede9fe);
+  background: #fff4df;
   border: 1rpx solid rgba(99, 102, 241, 0.12);
 }
 
@@ -830,10 +844,10 @@ page {
   display: flex;
   align-items: center;
   gap: 8rpx;
-  padding: 12rpx 26rpx;
+  padding: 10rpx 24rpx;
   border-radius: 999rpx;
   background: linear-gradient(135deg, #6366f1, #a855f7);
-  box-shadow: 0 8rpx 18rpx rgba(99, 102, 241, 0.3);
+  box-shadow: 0 6rpx 14rpx rgba(99, 102, 241, 0.3);
   position: relative;
   overflow: hidden;
 }

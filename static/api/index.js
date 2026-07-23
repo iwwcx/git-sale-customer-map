@@ -191,10 +191,40 @@ export function followEnterpriseList(params) {
   });
 }
 
+// 获取订阅企业线索未读数
+export function followEnterpriseClues(params) {
+  return request({
+    url: '/tanke/followEnterpriseClues',
+    method: 'get',
+    params,
+    apiKey: 'api80',
+  });
+}
+
 // 关注用户列表
 export function followUserList(params) {
   return request({
     url: '/tanke/followUserList',
+    method: 'get',
+    params,
+    apiKey: 'api80',
+  });
+}
+
+// 标记订阅线索已读
+export function markFollowClueRead(data) {
+  return request({
+    url: '/tanke/markFollowClueRead',
+    method: 'post',
+    data,
+    apiKey: 'api80',
+  });
+}
+
+// 获取订阅用户线索未读数
+export function followUserClues(params) {
+  return request({
+    url: '/tanke/followUserClues',
     method: 'get',
     params,
     apiKey: 'api80',
@@ -390,32 +420,12 @@ export function deepseekQuery(data) {
   });
 }
 
-// 我的AI报告列表
-export function getAiReportList(params) {
-  return request({
-    url: '/tanke/aiReportList',
-    method: 'get',
-    params,
-    apiKey: 'api80'
-  });
-}
-
-// AI报告详情
-export function getAiReportDetail(params) {
-  return request({
-    url: '/tanke/aiReportDetail',
-    method: 'get',
-    params,
-    apiKey: 'api80'
-  });
-}
-
 // ==================== 本地线索相关接口 ====================
 
-// 获取本地线索未读数量（角标用）
-export function getLocalLeadsUnreadCount(params) {
+// 校验企业状态（是否金牌企业/是否有广告/是否有关键词-即是否上传产品）
+export function checkEnterpriseStatus(params) {
   return request({
-    url: '/tanke/localLeadsUnreadCount',
+    url: '/tanke/checkEnterpriseStatus',
     method: 'get',
     params,
     apiKey: 'api80'
@@ -472,6 +482,27 @@ export function deleteClueView(data) {
   });
 }
 
+
+// 我的AI报告列表
+export function getAiReportList(params) {
+  return request({
+    url: '/tanke/aiReportList',
+    method: 'get',
+    params,
+    apiKey: 'api80'
+  });
+}
+
+// AI报告详情
+export function getAiReportDetail(params) {
+  return request({
+    url: '/tanke/aiReportDetail',
+    method: 'get',
+    params,
+    apiKey: 'api80'
+  });
+}
+
 // ==================== 分享统计相关接口 ====================
 
 // 获取分享标识值
@@ -520,7 +551,7 @@ export function batchDeleteDir(dirCategoryID, dirId) {
   return request({
     url: `/dir/${dirCategoryID}/batchdelete`,
     method: 'post',
-    data: { dirId },
+    data: [dirId],
     apiKey: 'api60'
   });
 }
@@ -531,7 +562,8 @@ export function deleteDirData(dataId, dirCategoryId) {
     url: '/res/del',
     method: 'post',
     data: { dataId, dirCategoryId },
-    apiKey: 'profitapi'
+    apiKey: 'profitapi',
+    tokenType: 'jrzz'
   });
 }
 
@@ -541,6 +573,16 @@ export function addDirData(data) {
     url: '/res/add',
     method: 'post',
     data,
-    apiKey: 'profitapi'
+    apiKey: 'profitapi',
+    tokenType: 'jrzz'
+  });
+}
+
+// 获取转发记录树形图
+export function inviteTree() {
+  return request({
+    url: '/tanke/inviteTree',
+    method: 'get',
+    apiKey: 'api80'
   });
 }
